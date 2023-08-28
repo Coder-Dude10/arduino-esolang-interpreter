@@ -25,7 +25,6 @@ String outputString = "";
 SevSeg sevseg;
 
 void setup() {
-  Serial.begin(9600);
   byte numDigits = 4;
   byte digitPins[] = {2, 3, 4, 5};
   byte segmentPins[] = {6, 7, 8, 9, 10, 12, 13};
@@ -86,7 +85,7 @@ void loop() {
     }
 
     if (analogInputValue1 < 520 && nextCommand && deviceOn) {
-        if (currentCommand == 10) {
+        if (currentCommand == 12) {
             currentCommand = 1;
         } else {
             currentCommand++;
@@ -97,7 +96,7 @@ void loop() {
 
     if (analogInputValue1 > 500 && previousCommand && deviceOn) {
         if (currentCommand == 1) {
-            currentCommand = 10;
+            currentCommand = 12;
         } else {
             currentCommand--;
         }
@@ -232,6 +231,14 @@ void loop() {
 
         if (program[currentProgramCell] == 10) {
             tone(11, (cells[currentCell] * 100), (cells[currentCell + 1] * 100));
+        }
+
+        if (program[currentProgramCell] == 11) {
+            delay(cells[currentCell] * 100);
+        }
+
+        if (program[currentProgramCell] == 12) {
+            currentProgramCell = cells[currentCell];
         }
 
         currentProgramCell++;
