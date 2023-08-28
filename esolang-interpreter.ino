@@ -164,24 +164,24 @@ void loop() {
         if (program[currentProgramCell] == 2) {
             cells[currentCell]--;
         }
-
+        
         if (program[currentProgramCell] == 3) {
-            if (currentCell == 100) {
+            if (currentCell == 0) {
                 error = true;
                 outputError[3] = '1';
                 currentProgramCell = programLength;
             } else {
-                currentCell++;
+                currentCell--;
             }
         }
 
         if (program[currentProgramCell] == 4) {
-            if (currentCell == 0) {
+            if (currentCell == 100) {
                 error = true;
                 outputError[3] = '2';
                 currentProgramCell = programLength;
             } else {
-                currentCell--;
+                currentCell++;
             }
         }
 
@@ -263,7 +263,9 @@ void loop() {
         } else {
             sevseg.setNumber(outputString.toInt(), 0);
         }
-
-        sevseg.refreshDisplay();
+    } else {
+        sevseg.setChars("");
     }
+
+    sevseg.refreshDisplay();
 }
