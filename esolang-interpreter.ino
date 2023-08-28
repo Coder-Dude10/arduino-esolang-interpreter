@@ -85,7 +85,7 @@ void loop() {
     }
 
     if (analogInputValue1 < 520 && nextCommand && deviceOn) {
-        if (currentCommand == 12) {
+        if (currentCommand == 14) {
             currentCommand = 1;
         } else {
             currentCommand++;
@@ -96,7 +96,7 @@ void loop() {
 
     if (analogInputValue1 > 500 && previousCommand && deviceOn) {
         if (currentCommand == 1) {
-            currentCommand = 12;
+            currentCommand = 14;
         } else {
             currentCommand--;
         }
@@ -140,10 +140,11 @@ void loop() {
             error = false;
             currentCell = 0;
             currentProgramCell = 0;
-
+            
             for (int i = 0; i < 100; i++) {
                 if (program[i] != 0) {
                     programLength = i;
+                    cells[i] = 0;
                 }
             }
         }
@@ -165,7 +166,7 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 3) {
-            if (cells[currentCell] == 0 || currentCell == 100) {
+            if (currentCell == 100) {
                 error = true;
                 outputError[3] = '1';
                 currentProgramCell = programLength;
@@ -239,6 +240,14 @@ void loop() {
 
         if (program[currentProgramCell] == 12) {
             currentProgramCell = cells[currentCell];
+        }
+
+        if (program[currentProgramCell] == 13) {
+            currentCell = cells[currentCell];
+        }
+
+        if (program[currentProgramCell] == 14) {
+            cells[currentCell] = cells[cells[currentCell]];
         }
 
         currentProgramCell++;
