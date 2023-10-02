@@ -28,6 +28,8 @@ char commands[16] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', '~', '^',
 char ascii[27] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
 char *programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
 char programName[] = "AAAAAA";
+String devicePIN = "43345";
+String inputPIN = "";
 byte heart[] = {
   0b00000,
   0b01010,
@@ -195,6 +197,86 @@ void loop() {
                 lcd.noBacklight();
                 deviceOn = false;
             } else {
+                if (inputPIN == "") {
+                    digitalInputValue1 = 0;
+                    currentCommand = 0;
+                    currentCell = 0;
+                    lcd.clear();
+                    lcd.setCursor(0, 0);
+                    lcd.print("PIN=");
+                    lcd.setCursor(4, 0);
+                    lcd.blink();
+                    delay(500);
+
+                    while (currentCell < 5) {
+                        analogInputValue1 = analogRead(14);
+                        digitalInputValue1 = analogRead(16);
+                        
+                        if (analogInputValue1 > 767) {
+                            nextCommand = true;
+                        }
+                        
+                        if (analogInputValue1 < 255) {
+                            previousCommand = true;
+                        }
+                        
+                        if (analogInputValue1 < 520 && nextCommand) {
+                            if (currentCommand == 9) {
+                                currentCommand = 0;
+                            } else {
+                                currentCommand++;
+                            }
+                            
+                            delay(500);
+                            nextCommand = false;
+                        }
+                        
+                        if (analogInputValue1 > 500 && previousCommand) {
+                            if (currentCommand == 0) {
+                                currentCommand = 9;
+                            } else {
+                                currentCommand--;
+                            }
+                            
+                            delay(500);
+                            previousCommand = false;
+                        }
+
+                        if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
+                            inputPIN += String(currentCommand);
+                            lcd.print(currentCommand);
+
+                            if (currentCell < 5) {
+                                currentCell++;
+                                lcd.setCursor(currentCell + 4, 0);
+                            }
+
+                            delay(500);
+                        }
+                    }
+                    
+                    currentCommand = 0;
+                    lcd.clear();
+                    lcd.noBlink();
+                }
+
+                if (inputPIN != devicePIN) {
+                    lcd.setCursor(0, 0);
+                    lcd.print("ACCESS DENIED!");
+                    digitalInputValue1 = 0;
+                    inputPIN = "";
+                    delay(500);
+                    
+                    while (digitalInputValue1 < 1000) {
+                        digitalInputValue1 = analogRead(16);
+                    }
+
+                    goto end;
+                }
+                
+                digitalInputValue1 = 0;
+                delay(500);
+                
                 for (int i = 0; i < 4; i++) {
                     lcd.setCursor(1, i);
                     lcd.print(programNames[i]);
@@ -486,6 +568,8 @@ void loop() {
                     }
                 }
 
+                end:
+                
                 errorCell = programLength + 1;
                 errorType = 1;
             }
@@ -642,13 +726,45 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 7) {
-            cells[currentCell] = round(analogInputValue1 / 100);
-            cells[currentCell + 1] = round(analogInputValue2 / 100);
+            if (cells[currentCell] == 0) {
+                if (analogInputValue2 > 500 && previousCell && currentProgramCell != 0 && deviceOn) {
+                    cells[currentCell] = 1;
+                } else {
+                    cells[currentCell] = 0;
+                }
 
-            if (digitalInputValue1 == 1023) {
-                cells[currentCell + 2] = 1;
+                if (analogInputValue2 < 520 && nextCell && currentProgramCell != 100 && program[currentProgramCell] != 0 && deviceOn) {
+                    cells[currentCell + 1] = 1;
+                } else {
+                    cells[currentCell + 1] = 0;
+                }
+                
+                if (analogInputValue1 < 520) {
+                    cells[currentCell + 2] = 1;
+                } else {
+                    cells[currentCell + 2] = 0;
+                }
+                
+                if (analogInputValue1 > 500) {
+                    cells[currentCell + 3] = 1;
+                } else {
+                    cells[currentCell + 3] = 0;
+                }
+                
+                if (digitalInputValue1 > 1000 && analogInputValue2 < 1000) {
+                    cells[currentCell + 4] = 1;
+                } else {
+                    cells[currentCell + 4] = 0;
+                }
             } else {
-                cells[currentCell + 2] = 0;
+                cells[currentCell] = round(analogInputValue2 / 100);
+                cells[currentCell + 1] = round(analogInputValue1 / 100);
+
+                if (digitalInputValue1 > 1000 && analogInputValue2 < 1000) {
+                    cells[currentCell + 2] = 1;
+                } else {
+                    cells[currentCell + 2] = 0;
+                }
             }
         }
 
@@ -657,7 +773,9 @@ void loop() {
 
             if (cells[currentCell + 1] == 0) {
                 lcd.print(cells[currentCell]);
-            } else {
+            }
+            
+            if (cells[currentCell + 1] == 1) {
                 if (cells[currentCell] < 0 || cells[currentCell] > 49) {
                     errorType = 5;
                 } else {
@@ -674,10 +792,14 @@ void loop() {
                     }
                 }
             }
+            
+            if (cells[currentCell + 1] == 2) {
+                lcd.clear();
+            }
         }
 
         if (program[currentProgramCell] == 9) {
-            cells[currentCell] = random(2);
+            cells[currentCell] = random(cells[currentCell] + 1);
         }
 
         if (program[currentProgramCell] == 10) {
