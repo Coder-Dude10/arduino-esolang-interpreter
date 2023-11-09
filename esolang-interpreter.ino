@@ -13,12 +13,12 @@ int errorCell = 0;
 int programLength = 0;
 int bracketsPassed = 0;
 int currentProgram = 0;
-int cells[100] = {0};
-int program[100] = {0};
-int program1[100] = {8, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 4, 1, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 15, 4, 2, 3, 8};
-int program2[100] = {4, 10};
-int program3[100] = {0};
-int program4[100] = {0};
+int cells[80] = {0};
+int program[80] = {0};
+int program1[80] = {0};
+int program2[80] = {0};
+int program3[80] = {0};
+int program4[80] = {0};
 bool nextCommand = false;
 bool previousCommand = false;
 bool nextCell = false;
@@ -28,7 +28,7 @@ bool deviceOn = false;
 bool clearCells = true;
 bool sound = true;
 bool notCurrentProgram = false;
-char commands[16] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', '~', '^', '#', '=', '@', '*'};
+char commands[16] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*'};
 char ascii[27] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
 char *programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
 char programName[] = "AAAAAA";
@@ -120,12 +120,17 @@ void setup() {
     lcd.createChar(6, entity);
     lcd.setCursor(0, 0);
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 80; i++) {
         cells[i] = 0;
         program[i] = 0;
+        program1[i] = 0;
+        program2[i] = 0;
         program3[i] = 0;
         program4[i] = 0;
     }
+
+    program1[0] = 1;
+    program1[1] = 11;
 }
 
 void loop() {
@@ -170,7 +175,7 @@ void loop() {
         previousCell = true;
     }
     
-    if (analogInputValue2 < 520 && nextCell && currentProgramCell != 100 && program[currentProgramCell] != 0 && deviceOn) {
+    if (analogInputValue2 < 520 && nextCell && currentProgramCell != 80 && program[currentProgramCell] != 0 && deviceOn) {
         currentProgramCell++;
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         nextCell = false;
@@ -480,55 +485,55 @@ void loop() {
 
                 if (currentCommand == 0) {
                     if (errorCell == 0) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program1[i] = program[i];
                         }
                     }
 
                     if (errorCell == 1) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program2[i] = program[i];
                         }
                     }
 
                     if (errorCell == 2) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program3[i] = program[i];
                         }
                     }
 
                     if (errorCell == 3) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program4[i] = program[i];
                         }
                     }
 
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 80; i++) {
                         program[i] = 0;
                     }
                 }
 
                 if (currentCommand == 1) {
                     if (errorCell == 0) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program1[i];
                         }
                     }
 
                     if (errorCell == 1) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program2[i];
                         }
                     }
 
                     if (errorCell == 2) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program3[i];
                         }
                     }
 
                     if (errorCell == 3) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program4[i];
                         }
                     }
@@ -626,26 +631,26 @@ void loop() {
                     }
 
                     if (currentCommand == 0) {
-                        if (errorCell = 0) {
-                            for (int i = 0; i < 100; i++) {
+                        if (errorCell == 0) {
+                            for (int i = 0; i < 80; i++) {
                                 program1[i] = 0;
                             }
                         }
 
                         if (errorCell == 1) {
-                            for (int i = 0; i < 100; i++) {
+                            for (int i = 0; i < 80; i++) {
                                 program2[i] = 0;
                             }
                         }
 
                         if (errorCell == 2) {
-                            for (int i = 0; i < 100; i++) {
+                            for (int i = 0; i < 80; i++) {
                                 program3[i] = 0;
                             }
                         }
 
                         if (errorCell == 3) {
-                            for (int i = 0; i < 100; i++){
+                            for (int i = 0; i < 80; i++){
                                 program4[i] = 0;
                             }
                         }
@@ -768,7 +773,7 @@ void loop() {
             lcd.setCursor(0, 0);
             lcd.blink();
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 80; i++) {
                 if (program[i] != 0) {
                     programLength = i;
 
@@ -816,7 +821,7 @@ void loop() {
     if (digitalInputValue2 != 0 && !(deviceOn)) {
         lcd.backlight();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 80; i++) {
             if (program[i] != 0) {
                 programLength = i;
             }
@@ -894,7 +899,7 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 4) {
-            if (currentCell == 100) {
+            if (currentCell == 80) {
                 errorType = 2;
             } else {
                 currentCell++;
@@ -959,7 +964,7 @@ void loop() {
                     cells[currentCell] = 0;
                 }
 
-                if (analogInputValue2 < 520 && nextCell && currentProgramCell != 100 && program[currentProgramCell] != 0 && deviceOn) {
+                if (analogInputValue2 < 520 && nextCell && currentProgramCell != 80 && program[currentProgramCell] != 0 && deviceOn) {
                     cells[currentCell + 1] = 1;
                 } else {
                     cells[currentCell + 1] = 0;
@@ -1010,7 +1015,7 @@ void loop() {
                     }
 
                     if (cells[currentCell] > 15 && cells[currentCell] < 43) {
-                        lcd.print(ascii[currentCell - 16]);
+                        lcd.print(ascii[cells[currentCell] - 16]);
                     }
 
                     if (cells[currentCell] > 42) {
@@ -1033,19 +1038,32 @@ void loop() {
         if (program[currentProgramCell] == 10 && sound) {
             tone(11, (cells[currentCell] * 100), (cells[currentCell + 1] * 100));
         }
-        
+
         if (program[currentProgramCell] == 11) {
+            Serial.begin(9600);
+            
+            if (cells[currentCell + 1] == 0) {
+                Serial.print(cells[currentCell]);
+            } else {
+                if (cells[currentCell] < 16) {
+                    Serial.print(commands[cells[currentCell]]);
+                } else {
+                    Serial.print(ascii[cells[currentCell] - 16]);
+                }
+            }
+            
+            delay(500);
+            Serial.end();
+        }
+        
+        if (program[currentProgramCell] == 12) {
             delay(cells[currentCell] * 100);
         }
 
-        if (program[currentProgramCell] == 12) {
+        if (program[currentProgramCell] == 13) {
             currentProgramCell = cells[currentCell];
         }
-
-        if (program[currentProgramCell] == 13) {
-            currentCell = cells[currentCell];
-        }
-
+        
         if (program[currentProgramCell] == 14) {
             cells[currentCell] = cells[cells[currentCell]];
         }
@@ -1062,30 +1080,30 @@ void loop() {
 
                 if (inputPIN == devicePIN) {
                     if (cells[currentCell] == 0) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program1[i];
                         }
                     }
 
                     if (cells[currentCell] == 1) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program2[i];
                         }
                     }
 
                     if (cells[currentCell] == 2) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program3[i];
                         }
                     }
 
                     if (cells[currentCell] == 3) {
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 80; i++) {
                             program[i] = program4[i];
                         }
                     }
                     
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 80; i++) {
                         if (program[i] != 0) {
                             programLength = i;
                         }
@@ -1146,30 +1164,30 @@ void loop() {
 
         if (currentProgramCell == programLength && notCurrentProgram) {
             if (currentProgram == 0) {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 80; i++) {
                     program[i] = program1[i];
                 }
             }
 
             if (currentProgram == 1) {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 80; i++) {
                     program[i] = program2[i];
                 }
             }
 
             if (currentProgram == 2) {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 80; i++) {
                     program[i] = program3[i];
                 }
             }
 
             if (currentProgram == 3) {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 80; i++) {
                     program[i] = program4[i];
                 }
             }
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 80; i++) {
                 if (program[i] != 0) {
                     programLength = i;
                 }
