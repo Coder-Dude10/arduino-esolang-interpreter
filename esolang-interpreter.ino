@@ -139,34 +139,42 @@ void loop() {
     digitalInputValue1 = analogRead(16);
     digitalInputValue2 = analogRead(17);
     
-    if (analogInputValue1 > 767 && programState) {
-        nextCommand = true;
-    }
-
-    if (analogInputValue1 < 255 && programState) {
-        previousCommand = true;
-    }
-
-    if (analogInputValue1 < 520 && nextCommand && deviceOn) {
-        if (currentCommand == 15) {
-            currentCommand = 0;
-        } else {
-            currentCommand++;
+    if ((analogInputValue1 > 767 || analogInputValue1 < 255) && programState) {
+        lcd.noBlink();
+        
+        while (analogInputValue1 > 767 || analogInputValue1 < 255) {
+            if (analogInputValue1 > 767) {
+                if (currentCommand == 15) {
+                    currentCommand = 0;
+                } else {
+                    currentCommand++;
+                }
+            } else {
+                if (currentCommand == 0) {
+                    currentCommand = 15;
+                } else {
+                    currentCommand--;
+                }
+            }
+            
+            lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
+            lcd.print(commands[currentCommand]);
+            delay(500);
+            analogInputValue1 = analogRead(14);
         }
+        
+        lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
 
-        nextCommand = false;
-    }
-
-    if (analogInputValue1 > 500 && previousCommand && deviceOn) {
-        if (currentCommand == 0) {
-            currentCommand = 15;
+        if (program[currentProgramCell] == 0) {
+            lcd.print(F(" "));
         } else {
-            currentCommand--;
+            lcd.print(commands[program[currentProgramCell] - 1]);
         }
-
-        previousCommand = false;
+        
+        lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
+        lcd.blink();
     }
-
+    
     if (analogInputValue2 > 767 && programState) {
         nextCell = true;
     }
@@ -196,6 +204,7 @@ void loop() {
         } else {
             program[currentProgramCell] = currentCommand + 1;
             lcd.print(commands[currentCommand]);
+            lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         }
         
         digitalInputDelay = 0;
