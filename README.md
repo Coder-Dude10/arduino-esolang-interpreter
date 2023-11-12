@@ -12,7 +12,7 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | , | Take input and set current and following cells to either (left, right, up, down, enter) or (analogInput1, analogInput2, enter). | mode |
 | . | Output integer or character at character (x, y) on display, or clear the display. | currentCellValue, mode, x, y |
 | ? | Set current cell value to random integer from 0 to (maximumIntegerValue). | maximumIntegerValue |
-| ! | Output value of a cell as a tone with a not value of (note) and a duration of (duration / 10) seconds. | note, duration |
+| ! | Output value of a cell as a tone with a note value of (note) and a duration of (duration / 10) seconds. | note, duration |
 | : | Output integer or character over serial. | mode |
 | ~ | Pause for (duration / 10) seconds. | duration |
 | ^ | Set pointer to value of current cell. | currentCellValue |
