@@ -312,36 +312,36 @@ void loop() {
                         analogInputValue1 = analogRead(14);
                         digitalInputValue1 = analogRead(16);
                         
-                        if (analogInputValue1 > 767) {
-                            nextCommand = true;
-                        }
-                        
-                        if (analogInputValue1 < 255) {
-                            previousCommand = true;
-                        }
-                        
-                        if (analogInputValue1 < 520 && nextCommand) {
-                            if (currentCommand == 9) {
-                                currentCommand = 0;
-                            } else {
-                                currentCommand++;
-                            }
+                        if (analogInputValue1 > 767 || analogInputValue1 < 255) {
+                            lcd.noBlink();
                             
-                            delay(500);
-                            nextCommand = false;
-                        }
-                        
-                        if (analogInputValue1 > 500 && previousCommand) {
-                            if (currentCommand == 0) {
-                                currentCommand = 9;
-                            } else {
-                                currentCommand--;
+                            while (analogInputValue1 > 767 || analogInputValue1 < 255) {
+                                if (analogInputValue1 > 767) {
+                                    if (currentCommand == 9) {
+                                        currentCommand = 0;
+                                    } else {
+                                        currentCommand++;
+                                    }
+                                } else {
+                                    if (currentCommand == 0) {
+                                        currentCommand == 9;
+                                    } else {
+                                        currentCommand--;
+                                    }
+                                }
+                                
+                                lcd.setCursor(currentCell + 4, 0);
+                                lcd.print(currentCommand);
+                                delay(500);
+                                analogInputValue1 = analogRead(14);
                             }
-                            
-                            delay(500);
-                            previousCommand = false;
-                        }
 
+                            lcd.setCursor(currentCell + 4, 0);
+                            lcd.print(F(" "));
+                            lcd.setCursor(currentCell + 4, 0);
+                            lcd.blink();
+                        }
+                        
                         if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
                             inputPIN += String(currentCommand);
                             lcd.print(currentCommand);
@@ -565,36 +565,36 @@ void loop() {
                         analogInputValue1 = analogRead(14);
                         digitalInputValue1 = analogRead(16);
                         
-                        if (analogInputValue1 > 767) {
-                          nextCommand = true;
-                        }
-                        
-                        if (analogInputValue1 < 255) {
-                          previousCommand = true;
-                        }
-                        
-                        if (analogInputValue1 < 520 && nextCommand) {
-                            if (currentCommand == 26) {
-                                currentCommand = 0;
-                            } else {
-                                currentCommand++;
-                            }
+                        if (analogInputValue1 > 767 || analogInputValue1 < 255) {
+                            lcd.noBlink();
                             
-                            delay(500);
-                            nextCommand = false;
-                        }
-                        
-                        if (analogInputValue1 > 500 && previousCommand) {
-                            if (currentCommand == 0) {
-                                currentCommand = 26;
-                            } else {
-                                currentCommand--;
+                            while (analogInputValue1 > 767 || analogInputValue1 < 255) {
+                                if (analogInputValue1 > 767) {
+                                    if (currentCommand == 26) {
+                                        currentCommand = 0;
+                                    } else {
+                                        currentCommand++;
+                                    }
+                                } else {
+                                    if (currentCommand == 0) {
+                                        currentCommand = 26;
+                                    } else {
+                                        currentCommand--;
+                                    }
+                                }
+                                
+                                lcd.setCursor(currentCell + 13, 0);
+                                lcd.print(ascii[currentCommand]);
+                                delay(500);
+                                analogInputValue1 = analogRead(14);
                             }
-                            
-                            delay(500);
-                            previousCommand = false;
-                        }
 
+                            lcd.setCursor(currentCell + 13, 0);
+                            lcd.print(F(" "));
+                            lcd.setCursor(currentCell + 13, 0);
+                            lcd.blink();
+                        }
+                        
                         if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
                             programName[currentCell] = ascii[currentCommand];
                             lcd.print(ascii[currentCommand]);
@@ -1036,8 +1036,6 @@ void loop() {
             if (cells[currentCell + 1] == 2) {
                 lcd.clear();
             }
-
-            delay(500);
         }
 
         if (program[currentProgramCell] == 9) {
