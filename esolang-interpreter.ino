@@ -19,6 +19,7 @@ int program1[80] = {0};
 int program2[80] = {0};
 int program3[80] = {0};
 int program4[80] = {0};
+int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
 bool nextCommand = false;
 bool previousCommand = false;
 bool nextCell = false;
@@ -1043,7 +1044,7 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 10 && sound) {
-            tone(11, (cells[currentCell] * 100), (cells[currentCell + 1] * 100));
+            tone(11, notes[cells[currentCell] + 13], (cells[currentCell + 1] * 100));
         }
 
         if (program[currentProgramCell] == 11) {
