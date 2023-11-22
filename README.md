@@ -24,8 +24,8 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | --- | --- |
 | 1 | Minimum of cell memory reached. |
 | 2 | Maxiumum of cell memory reached. |
-| 3 | Corresponding ']' not found. |
-| 4 | Corresponding '[' not found. |
+| 3 | Corresponding ']' command not found. |
+| 4 | Corresponding '[' command not found. |
 | 5 | Invalid character value. |
 | 6 | Invalid note value. |
 | 7 | Invalid program index value. |
