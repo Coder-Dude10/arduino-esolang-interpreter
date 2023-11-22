@@ -15,8 +15,9 @@ int bracketsPassed = 0;
 int currentProgram = 0;
 int cells[80] = {0};
 int program[80] = {0};
-int program1[80] = {0};
-int program2[80] = {0};
+int program1[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 
+16};
+int program2[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
 int program3[80] = {0};
 int program4[80] = {0};
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
@@ -124,14 +125,9 @@ void setup() {
     for (int i = 0; i < 80; i++) {
         cells[i] = 0;
         program[i] = 0;
-        program1[i] = 0;
-        program2[i] = 0;
         program3[i] = 0;
         program4[i] = 0;
     }
-
-    program1[0] = 1;
-    program1[1] = 11;
 }
 
 void loop() {
@@ -443,7 +439,7 @@ void loop() {
                 lcd.setCursor(1, 2);
                 lcd.print(F("Rename"));
                 lcd.setCursor(1, 3);
-                lcd.print(F("Clear"));
+                lcd.print(F("Transmit"));
                 lcd.setCursor(0, 0);
                 lcd.print(F(">"));
                 delay(500);
@@ -610,61 +606,57 @@ void loop() {
                 }
 
                 if (currentCommand == 3) {
-                    digitalInputValue1 = 0;
-                    currentCommand = 0;
-                    lcd.clear();
-                    lcd.setCursor(1, 0);
-                    lcd.print(F("Confirm"));
-                    lcd.setCursor(1, 1);
-                    lcd.print(F("Cancel"));
-                    lcd.setCursor(0, 0);
-                    lcd.print(F(">"));
-                    delay(500);
+                    Serial.begin(9600);
 
-                    while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
-                        analogInputValue1 = analogRead(14);
-                        digitalInputValue1 = analogRead(16);
-                        
-                        if (analogInputValue1 > 767 || analogInputValue1 < 255) {
-                            nextCommand = true;
+                    if (errorCell == 0) {
+                        for (int i = 0; i < 80; i++) {
+                            if (program1[i] != 0) {
+                                programLength = i;
+                            }
                         }
-                        
-                        if ((analogInputValue1 < 520 || analogInputValue1 > 500) && nextCommand) {
-                            lcd.setCursor(0, currentCommand);
-                            lcd.print(F(" "));
-                            currentCommand = (currentCommand * -1) + 1;
-                            lcd.setCursor(0, currentCommand);
-                            lcd.print(F(">"));
-                            delay(500);
-                            nextCommand = false;
+
+                        for (int i = 0; i < (programLength + 1); i++) {
+                            Serial.print(commands[program1[i] - 1]);
                         }
                     }
 
-                    if (currentCommand == 0) {
-                        if (errorCell == 0) {
-                            for (int i = 0; i < 80; i++) {
-                                program1[i] = 0;
+                    if (errorCell == 1) {
+                        for (int i = 0; i < 80; i++) {
+                            if (program2[i] != 0) {
+                                programLength = i;
                             }
                         }
 
-                        if (errorCell == 1) {
-                            for (int i = 0; i < 80; i++) {
-                                program2[i] = 0;
-                            }
-                        }
-
-                        if (errorCell == 2) {
-                            for (int i = 0; i < 80; i++) {
-                                program3[i] = 0;
-                            }
-                        }
-
-                        if (errorCell == 3) {
-                            for (int i = 0; i < 80; i++){
-                                program4[i] = 0;
-                            }
+                        for (int i = 0; i < (programLength + 1); i++) {
+                            Serial.print(commands[program2[i] - 1]);
                         }
                     }
+
+                    if (errorCell == 2) {
+                        for (int i = 0; i < 80; i++) {
+                            if (program3[i] != 0) {
+                                programLength = i;
+                            }
+                        }
+
+                        for (int i = 0; i < (programLength + 1); i++) {
+                            Serial.print(commands[program3[i] - 1]);
+                        }
+                    }
+
+                    if (errorCell == 3) {
+                        for (int i = 0; i < 80; i++) {
+                            if (program4[i] != 0) {
+                                programLength = i;
+                            }
+                        }
+
+                        for (int i = 0; i < (programLength + 1); i++) {
+                            Serial.print(commands[program4[i] - 1]);
+                        }
+                    }
+
+                    Serial.end();
                 }
 
                 goto end;
@@ -1044,7 +1036,11 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 10 && sound) {
-            tone(11, notes[cells[currentCell] + 13], (cells[currentCell + 1] * 100));
+            if (cells[currentCell] > -14 && cells[currentCell] < 12) {
+                tone(11, notes[cells[currentCell] + 13], (cells[currentCell + 1] * 100));
+            } else {
+                errorType = 6;
+            }
         }
 
         if (program[currentProgramCell] == 11) {
@@ -1078,7 +1074,7 @@ void loop() {
 
         if (program[currentProgramCell] == 15) {
             if (cells[currentCell] < 0 || cells[currentCell] > 3) {
-                errorType = 6;
+                errorType = 7;
             } else {
                 inputPIN = "";
 
@@ -1121,7 +1117,7 @@ void loop() {
                     notCurrentProgram = true;
                     currentProgramCell = -1;
                 } else {
-                    errorType = 7;
+                    errorType = 8;
                 }
             }
         }
