@@ -21,6 +21,7 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | * | Do not clear cell memory when program is finished. | - |
 # Brainfk++ Error Codes
 | Error | Description |
+| --- | --- |
 | 1 | Minimum of cell memory reached. |
 | 2 | Maxiumum of cell memory reached. |
 | 3 | Corresponding ']' not found. |
