@@ -32,8 +32,8 @@ bool sound = true;
 bool notCurrentProgram = false;
 char commands[16] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*'};
 char ascii[27] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
-char *programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
 char programName[] = "AAAAAA";
+String programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
 String devicePIN = "43345";
 String inputPIN = "";
 byte heart[] = {
@@ -211,7 +211,7 @@ void loop() {
         delay(500);
         digitalInputValue2 = analogRead(17);
 
-        if (digitalInputValue2 == 0) {
+        if (digitalInputValue2 == 0 && programState) {
             delay(500);
             lcd.clear();
             lcd.noBlink();
@@ -845,33 +845,33 @@ void loop() {
             goto startupSoundEnd;
         }
         
-        tone(11, 15, 5.81395348837);
+        tone(11, 15, 5.81);
         delay(200);
-        tone(11, 14, 5.81395348837);
+        tone(11, 14, 5.81);
         delay(25);
-        tone(11, 184, 69.7674418605);
+        tone(11, 184, 69.77);
         delay(150);
-        tone(11, 14, 5.81395348837);
+        tone(11, 14, 5.81);
         delay(35);
-        tone(11, 2489, 69.7674418605);
+        tone(11, 2489, 69.77);
         delay(150);
-        tone(11, 14, 5.81395348837);
+        tone(11, 14, 5.81);
         delay(35);
-        tone(11, 2217, 69.7674418605);
+        tone(11, 2217, 69.77);
         delay(150);
-        tone(11, 15, 5.81395348837);
+        tone(11, 15, 5.81);
         delay(100);
-        tone(11, 13, 5.81395348837);
+        tone(11, 13, 5.81);
         delay(100);
-        tone(11, 14, 5.81395348837);
+        tone(11, 14, 5.81);
         delay(200);
-        tone(11, 2217, 151.162790698);
+        tone(11, 2217, 151.16);
         delay(100);
-        tone(11, 14, 5.81395348837);
+        tone(11, 14, 5.81);
         delay(35);
-        tone(11, 9, 5.81395348837);
+        tone(11, 9, 5.81);
         delay(100);
-        tone(11, 15, 5.81395348837);
+        tone(11, 15, 5.81);
 
         startupSoundEnd:
 
@@ -914,6 +914,15 @@ void loop() {
             openBracketStart:
             
             while (program[currentProgramCell] != 6) {
+                analogInputValue1 = analogRead(14);
+                analogInputValue2 = analogRead(15);
+                digitalInputValue2 = analogRead(17);
+                
+                if (digitalInputValue2 == 0 && analogInputValue1 > 50 && analogInputValue2 > 500) {
+                    programState = true;
+                    break;
+                }
+                
                 if (currentProgramCell == programLength) {
                     errorType = 3;
                     break;
@@ -939,6 +948,15 @@ void loop() {
             closedBracketStart:
 
             while (program[currentProgramCell] != 5) {
+                analogInputValue1 = analogRead(14);
+                analogInputValue2 = analogRead(15);
+                digitalInputValue2 = analogRead(17);
+
+                if (digitalInputValue2 == 0 && analogInputValue1 > 50 && analogInputValue2 > 500) {
+                    programState = true;
+                    break;
+                }
+                
                 if (currentProgramCell == 0) {
                     errorType = 4;
                     break;
