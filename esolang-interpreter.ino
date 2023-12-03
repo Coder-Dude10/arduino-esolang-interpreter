@@ -1026,18 +1026,22 @@ void loop() {
             }
             
             if (cells[currentCell + 1] == 1) {
-                if (cells[currentCell] < 0 || cells[currentCell] > 49) {
+                if (cells[currentCell] < 0 || cells[currentCell] > 42) {
                     errorType = 5;
                 } else {
-                    if (cells[currentCell] < 43) {
-                        lcd.print(ascii[cells[currentCell]]);
-                    } else {
-                        lcd.write(byte(cells[currentCell] - 43));
-                    }
+                    lcd.print(ascii[cells[currentCell]]);
                 }
             }
             
             if (cells[currentCell + 1] == 2) {
+                if (cells[currentCell] < 0 || cells[currentCell] > 6) {
+                    errorType = 5;
+                } else {
+                    lcd.write(byte(cells[currentCell]));
+                }
+            }
+
+            if (cells[currentCell + 1] == 3) {
                 lcd.clear();
             }
         }
