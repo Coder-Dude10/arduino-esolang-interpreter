@@ -1076,7 +1076,7 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 13) {
-            currentProgramCell = cells[currentCell];
+            currentCell = cells[currentCell];
         }
         
         if (program[currentProgramCell] == 14) {
