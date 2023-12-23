@@ -977,25 +977,25 @@ void loop() {
 
         if (program[currentProgramCell] == 7) {
             if (cells[currentCell] == 0) {
-                if (analogInputValue2 > 500 && previousCell && currentProgramCell != 0 && deviceOn) {
+                if (analogInputValue2 < 255) {
                     cells[currentCell] = 1;
                 } else {
                     cells[currentCell] = 0;
                 }
 
-                if (analogInputValue2 < 520 && nextCell && currentProgramCell != 80 && program[currentProgramCell] != 0 && deviceOn) {
+                if (analogInputValue2 > 767) {
                     cells[currentCell + 1] = 1;
                 } else {
                     cells[currentCell + 1] = 0;
                 }
                 
-                if (analogInputValue1 < 520) {
+                if (analogInputValue1 > 767) {
                     cells[currentCell + 2] = 1;
                 } else {
                     cells[currentCell + 2] = 0;
                 }
                 
-                if (analogInputValue1 > 500) {
+                if (analogInputValue1 < 255) {
                     cells[currentCell + 3] = 1;
                 } else {
                     cells[currentCell + 3] = 0;
