@@ -13,6 +13,7 @@ int errorCell = 0;
 int programLength = 0;
 int bracketsPassed = 0;
 int currentProgram = 0;
+int currentDebugCell = 0;
 int cells[80] = {0};
 int program[80] = {0};
 int program1[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 
@@ -21,6 +22,7 @@ int program2[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
 int program3[80] = {0};
 int program4[80] = {0};
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
+int debug[10] = {0};
 bool nextCommand = false;
 bool previousCommand = false;
 bool nextCell = false;
@@ -30,11 +32,12 @@ bool deviceOn = false;
 bool clearCells = true;
 bool sound = true;
 bool notCurrentProgram = false;
-char ascii[43] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
+char ascii[45] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '|', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
 char programName[] = "AAAAAA";
 String programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
 String devicePIN = "43345";
 String inputPIN = "";
+String debugOutput = "";
 byte heart[] = {
   0b00000,
   0b01010,
@@ -126,6 +129,7 @@ void setup() {
         program[i] = 0;
         program3[i] = 0;
         program4[i] = 0;
+        debug[i] = 0;
     }
 }
 
@@ -140,14 +144,14 @@ void loop() {
         
         while (analogInputValue1 > 767 || analogInputValue1 < 255) {
             if (analogInputValue1 > 767) {
-                if (currentCommand == 15) {
+                if (currentCommand == 17) {
                     currentCommand = 0;
                 } else {
                     currentCommand++;
                 }
             } else {
                 if (currentCommand == 0) {
-                    currentCommand = 15;
+                    currentCommand = 17;
                 } else {
                     currentCommand--;
                 }
@@ -580,7 +584,7 @@ void loop() {
                                 }
                                 
                                 lcd.setCursor(currentCell + 13, 0);
-                                lcd.print(ascii[currentCommand + 16]);
+                                lcd.print(ascii[currentCommand + 18]);
                                 delay(500);
                                 analogInputValue1 = analogRead(14);
                             }
@@ -770,6 +774,7 @@ void loop() {
             }
         } else {
             currentProgramCell = 0;
+            currentDebugCell = 0;
             lcd.clear();
             lcd.setCursor(0, 0);
             lcd.blink();
@@ -782,6 +787,10 @@ void loop() {
                         cells[i] = 0;
                     }
                 }
+            }
+
+            for (int i = 0; i < 10; i++) {
+                debug[i] = 0;
             }
 
             clearCells = true;
@@ -1026,7 +1035,7 @@ void loop() {
             }
             
             if (cells[currentCell + 1] == 1) {
-                if (cells[currentCell] < 0 || cells[currentCell] > 42) {
+                if (cells[currentCell] < 0 || cells[currentCell] > 44) {
                     errorType = 5;
                 } else {
                     lcd.print(ascii[cells[currentCell]]);
@@ -1135,6 +1144,22 @@ void loop() {
 
         if (program[currentProgramCell] == 16) {
             clearCells = false;
+        }
+
+        if (program[currentProgramCell] == 17) {
+            debug[currentDebugCell] = cells[currentCell];
+            currentDebugCell++;
+        }
+
+        if (program[currentProgramCell] == 18) {
+            debugOutput = debug[0];
+
+            for (int i = 1; i < currentDebugCell; i++) {
+                debugOutput += ("," + String(debug[i]));
+            }
+            
+            lcd.setCursor(0, 0);
+            lcd.print(debugOutput);
         }
         
         if (errorType != 0) {
