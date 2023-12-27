@@ -788,11 +788,7 @@ void loop() {
                     }
                 }
             }
-
-            for (int i = 0; i < 10; i++) {
-                debug[i] = 0;
-            }
-
+            
             clearCells = true;
             
             if (errorType == 0) {
@@ -1147,6 +1143,10 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 17) {
+            if (currentDebugCell == 10) {
+                currentDebugCell = 0;
+            }
+            
             debug[currentDebugCell] = cells[currentCell];
             currentDebugCell++;
         }
