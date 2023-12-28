@@ -20,7 +20,7 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | @ | If correct PIN is given, execute program (programIndexNumber). | programIndexNumber, PINDigit1, PINDigit2, PINDigit3, PINDigit4, PINDigit5 |
 | * | Do not clear cell memory when program is finished. | - |
 | / | Push (currentCellValue) to debug array. | currentCellValue |
-| │ | Output debug array at character (0, 0). | - |
+| " | Output debug array at character (0, 0). | - |
 # Brainfk++ Error Codes
 | Error | Description |
 | --- | --- |
