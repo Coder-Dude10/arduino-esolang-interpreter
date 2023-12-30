@@ -1152,8 +1152,8 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 18) {
-            debugOutput = debug[0];
-
+            debugOutput = String(debug[0]);
+            
             for (int i = 1; i < currentDebugCell; i++) {
                 debugOutput += ("," + String(debug[i]));
             }
