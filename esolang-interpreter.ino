@@ -68,16 +68,6 @@ byte crossMark[] = {
   0b10001,
   0b00000
 };
-byte particulate[] = {
-  0b01010,
-  0b10001,
-  0b00100,
-  0b01010,
-  0b00100,
-  0b10001,
-  0b01010,
-  0b00000
-};
 byte apple[] = {
   0b00010,
   0b00100,
@@ -108,6 +98,16 @@ byte entity[] = {
   0b01110,
   0b11011
 };
+byte deleteCharacter[] = {
+	0b00000,
+	0b00111,
+	0b01101,
+	0b10010,
+	0b01101,
+	0b00111,
+	0b00000,
+	0b00000
+};
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
@@ -118,10 +118,10 @@ void setup() {
     lcd.createChar(0, heart);
     lcd.createChar(1, checkMark);
     lcd.createChar(2, crossMark);
-    lcd.createChar(3, particulate);
-    lcd.createChar(4, apple);
-    lcd.createChar(5, banana);
-    lcd.createChar(6, entity);
+    lcd.createChar(3, apple);
+    lcd.createChar(4, banana);
+    lcd.createChar(5, entity);
+    lcd.createChar(6, deleteCharacter);
     lcd.setCursor(0, 0);
 
     for (int i = 0; i < 80; i++) {
@@ -144,21 +144,27 @@ void loop() {
         
         while (analogInputValue1 > 767 || analogInputValue1 < 255) {
             if (analogInputValue1 > 767) {
-                if (currentCommand == 17) {
+                if (currentCommand == 18) {
                     currentCommand = 0;
                 } else {
                     currentCommand++;
                 }
             } else {
                 if (currentCommand == 0) {
-                    currentCommand = 17;
+                    currentCommand = 18;
                 } else {
                     currentCommand--;
                 }
             }
             
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-            lcd.print(ascii[currentCommand]);
+
+            if (currentCommand == 18) {
+                lcd.write(byte(6));
+            } else {
+                lcd.print(ascii[currentCommand]);
+            }
+            
             delay(500);
             analogInputValue1 = analogRead(14);
         }
@@ -195,15 +201,51 @@ void loop() {
         previousCell = false;
     }
     
-    if (digitalInputValue1 > 1000 && analogInputValue2 < 1000 && digitalInputDelay == 500 && currentProgramCell != 101 && programState && deviceOn) {
-        if (program[currentProgramCell] == 0) {
-            program[currentProgramCell] = currentCommand + 1;
-            lcd.print(ascii[currentCommand]);
-            currentProgramCell++;
-            lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
+    if (digitalInputValue1 > 1000 && analogInputValue2 < 1000 && digitalInputDelay == 500 && currentProgramCell != 80 && programState && deviceOn) {
+        if (currentCommand == 18) {
+            program[currentProgramCell] = 0;
+
+            for (int i = 0; i < 79; i++) {
+                if (program[i] == 0) {
+                    program[i] = program[i + 1];
+                    program[i + 1] = 0;
+                }
+            }
+
+            errorCell = currentProgramCell;
         } else {
-            program[currentProgramCell] = currentCommand + 1;
-            lcd.print(ascii[currentCommand]);
+            if (program[currentProgramCell] == 0) {
+                program[currentProgramCell] = currentCommand + 1;
+                lcd.print(ascii[currentCommand]);
+                currentProgramCell++;
+                lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
+            } else {
+                for (int i = 0; i < (80 - currentProgramCell); i++) {
+                    program[80 - i] = program[79 - i];
+                }
+
+                program[currentProgramCell] = currentCommand + 1;
+                errorCell = currentProgramCell;
+            }
+        }
+
+        if (currentCommand == 18 || program[currentProgramCell] != 0) {
+            for (int i = 0; i < 80; i++) {
+                if (program[i] != 0) {
+                    programLength = i;
+                }
+            }
+
+            lcd.clear();
+            
+            if (program[0] != 0) {
+                for (currentProgramCell = 0; currentProgramCell < (programLength + 1); currentProgramCell++) {
+                    lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
+                    lcd.print(ascii[program[currentProgramCell] - 1]);
+                }
+            }
+
+            currentProgramCell = errorCell;
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         }
         
@@ -1024,7 +1066,11 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 8) {
-            lcd.setCursor(cells[currentCell + 2], cells[currentCell + 3]);
+            if (cells[currentCell + 2] < 20) {
+                lcd.setCursor(cells[currentCell + 2], cells[currentCell + 3]);
+            } else {
+                lcd.setCursor(cells[currentCell + 2] % 20, floor(cells[currentCell + 2] / 20));
+            }
 
             if (cells[currentCell + 1] == 0) {
                 lcd.print(cells[currentCell]);
