@@ -17,7 +17,7 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | ~ | Pause for (duration / 10) seconds. | duration |
 | ^ | Set pointer to value of current cell. | currentCellValue |
 | = | Set value of current cell to value of cell (currentCellValue). | currentCellValue |
-| @ | If correct PIN is given, execute program (programIndexNumber). | programIndexNumber, PINDigit1, PINDigit2, PINDigit3, PINDigit4, PINDigit5 |
+| @ | If global PIN has been set and is correct, execute program (programIndexNumber). | programIndexNumber |
 | * | Do not clear cell memory when program is finished. | - |
 | / | Push (currentCellValue) to debug array. | currentCellValue |
 | " | Output debug array at character (0, 0). | - |
