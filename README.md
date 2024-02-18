@@ -31,4 +31,4 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | 5 | Invalid character value. |
 | 6 | Invalid note value. |
 | 7 | Invalid program index value. |
-| 8 | Invalid PIN. |
+| 8 | Access denied. |
