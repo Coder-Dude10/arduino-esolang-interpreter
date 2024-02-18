@@ -34,7 +34,8 @@ bool sound = true;
 bool notCurrentProgram = false;
 char ascii[45] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
 char programName[] = "AAAAAA";
-String programNames[] = {"PROGRAM1", "PROGRAM2", "PROGRAM3", "PROGRAM4"};
+char charBuffer = 'A';
+String programNames[] = {"PROGRAM0", "PROGRAM1", "PROGRAM2", "PROGRAM3"};
 String devicePIN = "43345";
 String inputPIN = "";
 String debugOutput = "";
@@ -662,6 +663,7 @@ void loop() {
 
                         for (int i = 0; i < (programLength + 1); i++) {
                             Serial.print(ascii[program1[i] - 1]);
+                            Serial.print('1');
                         }
                     }
 
@@ -674,6 +676,7 @@ void loop() {
 
                         for (int i = 0; i < (programLength + 1); i++) {
                             Serial.print(ascii[program2[i] - 1]);
+                            Serial.print('1');
                         }
                     }
 
@@ -686,6 +689,7 @@ void loop() {
 
                         for (int i = 0; i < (programLength + 1); i++) {
                             Serial.print(ascii[program3[i] - 1]);
+                            Serial.print('1');
                         }
                     }
 
@@ -698,6 +702,7 @@ void loop() {
 
                         for (int i = 0; i < (programLength + 1); i++) {
                             Serial.print(ascii[program4[i] - 1]);
+                            Serial.print('1');
                         }
                     }
 
@@ -1117,8 +1122,31 @@ void loop() {
             } else {
                 Serial.print(ascii[cells[currentCell]]);
             }
+
+            Serial.print(cells[currentCell + 2]);
             
-            delay(500);
+            if (cells[currentCell + 3] == 1) {
+                cells[currentCell] = -1;
+                
+                while (cells[currentCell] = -1) {
+                    if (Serial.available() > 0) {
+                        charBuffer = Serial.read();
+                        
+                        for (int i = 0; i < 45; i++) {
+                            if (ascii[i] == charBuffer) {
+                                cells[currentCell] = i;
+                                cells[currentCell + 1] = 1;
+                            }
+                        }
+
+                        if (cells[currentCell] == -1) {
+                            cells[currentCell] = atoi(charBuffer);
+                            cells[currentCell + 1] = 0;
+                        }
+                    }
+                }
+            }
+            
             Serial.end();
         }
         
@@ -1138,12 +1166,6 @@ void loop() {
             if (cells[currentCell] < 0 || cells[currentCell] > 3) {
                 errorType = 7;
             } else {
-                inputPIN = "";
-
-                for (int i = 1; i < 6; i++) {
-                    inputPIN += String(cells[currentCell + i]);
-                }
-
                 if (inputPIN == devicePIN) {
                     if (cells[currentCell] == 0) {
                         for (int i = 0; i < 80; i++) {
