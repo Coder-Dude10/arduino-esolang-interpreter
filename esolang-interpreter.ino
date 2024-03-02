@@ -19,7 +19,7 @@ int program[80] = {0};
 int program1[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 
 16};
 int program2[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
-int program3[80] = {0};
+int program3[80] = {4, 4, 4, 1, 3, 3, 3, 11, 8};
 int program4[80] = {0};
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
 int debug[10] = {0};
@@ -33,6 +33,7 @@ bool clearCells = true;
 bool sound = true;
 bool notCurrentProgram = false;
 char ascii[45] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
+char inputs[5] = {'l', 'r', 'u', 'd', 'e'};
 char programName[] = "AAAAAA";
 char charBuffer = 'A';
 String programNames[] = {"PROGRAM0", "PROGRAM1", "PROGRAM2", "PROGRAM3"};
@@ -128,7 +129,6 @@ void setup() {
     for (int i = 0; i < 80; i++) {
         cells[i] = 0;
         program[i] = 0;
-        program3[i] = 0;
         program4[i] = 0;
         debug[i] = 0;
     }
@@ -769,8 +769,11 @@ void loop() {
                 lcd.print(F("ub.com/Coder-Dude10"));
                 lcd.setCursor(0, 3);
                 lcd.print(F("Press ENTER to exit."));
-                digitalInputValue1 = 0;
-                delay(500);
+                delay(1000);
+
+                while (digitalInputValue1 > 1000) {
+                    digitalInputValue1 = analogRead(16);
+                }
                 
                 while (digitalInputValue1 < 1000) {
                     digitalInputValue1 = analogRead(16);
@@ -1128,20 +1131,30 @@ void loop() {
             if (cells[currentCell + 3] == 1) {
                 cells[currentCell] = -1;
                 
-                while (cells[currentCell] = -1) {
+                while (cells[currentCell] == -1) {
                     if (Serial.available() > 0) {
                         charBuffer = Serial.read();
-                        
-                        for (int i = 0; i < 45; i++) {
-                            if (ascii[i] == charBuffer) {
-                                cells[currentCell] = i;
-                                cells[currentCell + 1] = 1;
-                            }
-                        }
 
-                        if (cells[currentCell] == -1) {
-                            cells[currentCell] = atoi(charBuffer);
+                        if (int(charBuffer) > 47 && int(charBuffer) < 58) {
+                            cells[currentCell] = int(charBuffer) - 48;
                             cells[currentCell + 1] = 0;
+                        } else {
+                            if (int(charBuffer) > 96 && int(charBuffer) < 123) {
+                                for (int i = 0; i < 5; i++) {
+                                    if (inputs[i] == charBuffer) {
+                                        cells[currentCell + i] = 1;
+                                    } else {
+                                        cells[currentCell + i] = 0;
+                                    }
+                                }
+                            } else {
+                                for (int i = 0; i < 45; i++) {
+                                    if (ascii[i] == charBuffer) {
+                                        cells[currentCell] = i;
+                                        cells[currentCell + 1] = 1;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
