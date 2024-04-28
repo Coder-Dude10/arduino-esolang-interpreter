@@ -7,11 +7,11 @@ int currentCoordinate = 0;
 int currentCharValue = 0;
 int inputClock = 0;
 int shift = 0;
-int commands[18] = {43, 45, 60, 62, 91, 93, 44, 46, 63, 33, 58, 126, 94, 61, 64, 42, 47, 34};
 bool readReady = false;
 bool enter = false;
 char inChar = 'a';
 char dataChar = 'a';
+char commands[18] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"'};
 String charNames[7] = {"[heart]", "[checkMark]", "[crossMark]", "[apple]", "[banana]", "[entity]", "[deleteChar]"};
 
 void setup() {
@@ -41,15 +41,15 @@ void updateShiftLayer() {
     }
 }
 
-int ascii(int asciiValue) {
+char ascii(int asciiValue) {
     if (asciiValue < 10) {
-        return (asciiValue + 48);
+        return char(asciiValue + 48);
     } else {
         if (asciiValue < 37) {
             if (asciiValue == 36) {
-                return 32;
+                return ' ';
             } else {
-                return (asciiValue + 55);
+                return char(asciiValue + 55);
             }
         } else {
             return commands[asciiValue - 37];
@@ -68,7 +68,7 @@ void loop() {
                 if (enter) {
                     Serial.print('e');
                 } else {
-                    Serial.print(char(ascii(currentCharValue + (shift * 14))));
+                    Serial.print(ascii(currentCharValue + (shift * 14)));
                 }
                 
                 enter = false;
