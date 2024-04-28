@@ -21,6 +21,8 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | * | Do not clear cell memory when program is finished. | - |
 | / | Push (currentCellValue) to debug array. | currentCellValue |
 | " | Output debug array at character (0, 0). | - |
+# Brainfk++ Character Set
+![alt text](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Character%20Set.png?raw=true)
 # Brainfk++ Error Codes
 | Error | Description |
 | --- | --- |
