@@ -1104,23 +1104,9 @@ void loop() {
             }
             
             if (cells[currentCell + 1] == 2) {
-                if (cells[currentCell] < 0 || cells[currentCell] > 11) {
+                if (cells[currentCell] < 0 || cells[currentCell] > 5) {
                     errorType = 5;
                 } else {
-                    if (cells[currentCell] > 6) {
-                        for (int i = 0; i < 80; i++) {
-                            if (i % 2 == 0) {
-                                errorCell = program4[i] * 2;
-                            } else {
-                                tempChar[int(floor((i % 16) / 2))] = byte(errorCell + program4[i]);
-                            }
-
-                            if (i % 15 == 0 && i != 0) {
-                                lcd.createChar(((i / 16) + 6), tempChar);
-                            }
-                        }
-                    }
-                    
                     lcd.write(byte(cells[currentCell]));
                 }
             }
