@@ -20,7 +20,6 @@ int program1[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 
 int program2[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
 int program3[80] = {4, 4, 4, 1, 3, 3, 3, 11, 8};
 int program4[80] = {0};
-int commands[18] = {43, 45, 60, 62, 91, 93, 44, 46, 63, 33, 58, 126, 94, 61, 64, 42, 47, 34};
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
 int debug[10] = {0};
 bool nextCommand = false;
@@ -33,6 +32,7 @@ bool clearCells = true;
 bool sound = true;
 bool notCurrentProgram = false;
 char inputs[5] = {'l', 'r', 'u', 'd', 'e'};
+char commands[18] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"'};
 char programName[] = "AAAAAA";
 char charBuffer = 'A';
 String programNames[] = {"PROGRAM0", "PROGRAM1", "PROGRAM2", "PROGRAM3"};
@@ -143,14 +143,14 @@ void setup() {
     }
 }
 
-int ascii(int asciiValue) {
+char ascii(int asciiValue) {
     if (asciiValue < 18) {
         return commands[asciiValue];
     } else {
         if (asciiValue == 44) {
-            return 32;
+            return ' ';
         } else {
-            return (asciiValue + 47);
+            return char(asciiValue + 47);
         }
     }
 }
@@ -184,7 +184,7 @@ void loop() {
             if (currentCommand == 18) {
                 lcd.write(byte(6));
             } else {
-                lcd.print(char(ascii(currentCommand)));
+                lcd.print(ascii(currentCommand));
             }
             
             delay(500);
@@ -196,7 +196,7 @@ void loop() {
         if (program[currentProgramCell] == 0) {
             lcd.print(F(" "));
         } else {
-            lcd.print(char(ascii(program[currentProgramCell] - 1)));
+            lcd.print(ascii(program[currentProgramCell] - 1));
         }
         
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -238,7 +238,7 @@ void loop() {
         } else {
             if (program[currentProgramCell] == 0) {
                 program[currentProgramCell] = currentCommand + 1;
-                lcd.print(char(ascii(currentCommand)));
+                lcd.print(ascii(currentCommand));
                 currentProgramCell++;
                 lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
             } else {
@@ -263,7 +263,7 @@ void loop() {
             if (program[0] != 0) {
                 for (currentProgramCell = 0; currentProgramCell < (programLength + 1); currentProgramCell++) {
                     lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-                    lcd.print(char(ascii(program[currentProgramCell] - 1)));
+                    lcd.print(ascii(program[currentProgramCell] - 1));
                 }
             }
 
@@ -648,7 +648,7 @@ void loop() {
                                 }
                                 
                                 lcd.setCursor(currentCell + 13, 0);
-                                lcd.print(char(ascii(currentCommand + 18)));
+                                lcd.print(ascii(currentCommand + 18));
                                 delay(500);
                                 analogInputValue1 = analogRead(14);
                             }
@@ -660,8 +660,8 @@ void loop() {
                         }
                         
                         if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
-                            programName[currentCell] = char(ascii(currentCommand + 18));
-                            lcd.print(char(ascii(currentCommand + 18)));
+                            programName[currentCell] = ascii(currentCommand + 18);
+                            lcd.print(ascii(currentCommand + 18));
                             currentCell++;
                             lcd.setCursor(currentCell + 13, 0);
                             delay(500);
@@ -683,7 +683,7 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(char(ascii(program1[i] - 1)));
+                            Serial.print(ascii(program1[i] - 1));
                             Serial.print('1');
                         }
                     }
@@ -696,7 +696,7 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(char(ascii(program1[i] - 1)));
+                            Serial.print(ascii(program1[i] - 1));
                             Serial.print('1');
                         }
                     }
@@ -709,7 +709,7 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(char(ascii(program1[i] - 1)));
+                            Serial.print(ascii(program1[i] - 1));
                             Serial.print('1');
                         }
                     }
@@ -722,7 +722,7 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(char(ascii(program1[i] - 1)));
+                            Serial.print(ascii(program1[i] - 1));
                             Serial.print('1');
                         }
                     }
@@ -869,11 +869,11 @@ void loop() {
             if (programState && program[0] != 0) {
                 for (currentProgramCell = 0; currentProgramCell < programLength; currentProgramCell++) {
                     lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-                    lcd.print(char(ascii(program[currentProgramCell] - 1)));
+                    lcd.print(ascii(program[currentProgramCell] - 1));
                 }
 
                 lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-                lcd.print(char(ascii(program[currentProgramCell] - 1)));
+                lcd.print(ascii(program[currentProgramCell] - 1));
                 
                 if (errorType != 0) {
                     currentProgramCell = errorCell;
@@ -907,11 +907,11 @@ void loop() {
         if (program[0] != 0) {
             for (currentProgramCell = 0; currentProgramCell < programLength; currentProgramCell++) {
                 lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-                lcd.print(char(ascii(program[currentProgramCell] - 1)));
+                lcd.print(ascii(program[currentProgramCell] - 1));
             }
 
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
-            lcd.print(char(ascii(program[currentProgramCell] - 1)));
+            lcd.print(ascii(program[currentProgramCell] - 1));
         }
 
         lcd.blink();
@@ -1109,7 +1109,7 @@ void loop() {
                 if (cells[currentCell] < 0 || cells[currentCell] > 44) {
                     errorType = 5;
                 } else {
-                    lcd.print(char(ascii(cells[currentCell])));
+                    lcd.print(ascii(cells[currentCell]));
                 }
             }
             
@@ -1160,7 +1160,7 @@ void loop() {
             }
 
             if (cells[currentCell + 1] == 1) {
-                Serial.print(char(ascii(cells[currentCell])));
+                Serial.print(ascii(cells[currentCell]));
             }
 
             if (cells[currentCell + 1] == 2) {
@@ -1190,7 +1190,7 @@ void loop() {
                                 }
                             } else {
                                 for (int i = 0; i < 45; i++) {
-                                    if (char(ascii(i)) == charBuffer) {
+                                    if (ascii(i) == charBuffer) {
                                         cells[currentCell] = i;
                                         cells[currentCell + 1] = 1;
                                     }
