@@ -109,16 +109,6 @@ byte deleteChar[] = {
 	0b00000,
 	0b00000
 };
-byte tempChar[] = {
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000
-};
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
