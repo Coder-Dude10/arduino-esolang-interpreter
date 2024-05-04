@@ -16,11 +16,12 @@ int currentProgram = 0;
 int currentDebugCell = 0;
 int cells[80] = {0};
 int program[80] = {0};
-int program1[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 16};
-int program2[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
-int program3[80] = {4, 4, 4, 1, 3, 3, 3, 11, 8};
-int program4[80] = {0};
+int program0[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 16};
+int program1[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
+int program2[80] = {4, 4, 4, 1, 3, 3, 3, 11, 8};
+int program3[80] = {0};
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
+int powBase2[9] = {256, 128, 64, 32, 16, 8, 4, 2, 1};
 int debug[10] = {0};
 bool nextCommand = false;
 bool previousCommand = false;
@@ -31,6 +32,7 @@ bool deviceOn = false;
 bool clearCells = true;
 bool sound = true;
 bool notCurrentProgram = false;
+bool programConcatenation = false;
 char inputs[5] = {'l', 'r', 'u', 'd', 'e'};
 char commands[18] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"'};
 char programName[] = "AAAAAA";
@@ -112,6 +114,62 @@ byte deleteChar[] = {
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+char ascii(int value) {
+    if (value < 18) {
+        return commands[value];
+    } else {
+        if (value == 44) {
+            return ' ';
+        } else {
+            return char(value + 47);
+        }
+    }
+}
+
+int readCell(int index) {
+    if (index < 80) {
+        return cells[index];
+    }
+    
+    if (index > 79 && index < 160) {
+        return program0[index - 80];
+    }
+    
+    if (index > 159 && index < 240) {
+        return program1[index - 160];
+    }
+    
+    if (index > 239 && index < 320) {
+        return program2[index - 240];
+    }
+    
+    if (index > 319) {
+        return program3[index - 320];
+    }
+}
+
+void writeCell(int index, int value, int multiplier) {
+    if (index < 80) {
+        cells[index] = ((cells[index] * multiplier) + value);
+    }
+    
+    if (index > 79 && index < 160) {
+        program0[index - 80] = ((program0[index - 80] * multiplier) + value);
+    }
+    
+    if (index > 159 && index < 240) {
+        program1[index - 160] = ((program1[index - 160] * multiplier) + value);
+    }
+    
+    if (index > 239 && index < 320) {
+        program2[index - 240] = ((program2[index - 240] * multiplier) + value);
+    }
+    
+    if (index > 319) {
+        program3[index - 320] = ((program3[index - 320] * multiplier) + value);
+    } 
+}
+
 void(* resetFunc) (void) = 0;
 
 void setup() {
@@ -124,25 +182,11 @@ void setup() {
     lcd.createChar(5, entity);
     lcd.createChar(6, deleteChar);
     lcd.setCursor(0, 0);
-
-    for (int i = 0; i < 80; i++) {
-        cells[i] = 0;
-        program[i] = 0;
-        program4[i] = 0;
-        debug[i] = 0;
-    }
-}
-
-char ascii(int asciiValue) {
-    if (asciiValue < 18) {
-        return commands[asciiValue];
-    } else {
-        if (asciiValue == 44) {
-            return ' ';
-        } else {
-            return char(asciiValue + 47);
-        }
-    }
+    
+    memset(cells, 0, sizeof(cells));
+    memset(program, 0, sizeof(program));
+    memset(program3, 0, sizeof(program3));
+    memset(debug, 0, sizeof(debug));
 }
 
 void loop() {
@@ -549,25 +593,25 @@ void loop() {
                 if (currentCommand == 0) {
                     if (errorCell == 0) {
                         for (int i = 0; i < 80; i++) {
-                            program1[i] = program[i];
+                            program0[i] = program[i];
                         }
                     }
 
                     if (errorCell == 1) {
                         for (int i = 0; i < 80; i++) {
-                            program2[i] = program[i];
+                            program1[i] = program[i];
                         }
                     }
 
                     if (errorCell == 2) {
                         for (int i = 0; i < 80; i++) {
-                            program3[i] = program[i];
+                            program2[i] = program[i];
                         }
                     }
 
                     if (errorCell == 3) {
                         for (int i = 0; i < 80; i++) {
-                            program4[i] = program[i];
+                            program3[i] = program[i];
                         }
                     }
 
@@ -579,25 +623,25 @@ void loop() {
                 if (currentCommand == 1) {
                     if (errorCell == 0) {
                         for (int i = 0; i < 80; i++) {
-                            program[i] = program1[i];
+                            program[i] = program0[i];
                         }
                     }
 
                     if (errorCell == 1) {
                         for (int i = 0; i < 80; i++) {
-                            program[i] = program2[i];
+                            program[i] = program1[i];
                         }
                     }
 
                     if (errorCell == 2) {
                         for (int i = 0; i < 80; i++) {
-                            program[i] = program3[i];
+                            program[i] = program2[i];
                         }
                     }
 
                     if (errorCell == 3) {
                         for (int i = 0; i < 80; i++) {
-                            program[i] = program4[i];
+                            program[i] = program3[i];
                         }
                     }
 
@@ -667,18 +711,31 @@ void loop() {
 
                     if (errorCell == 0) {
                         for (int i = 0; i < 80; i++) {
+                            if (program0[i] != 0) {
+                                programLength = i;
+                            }
+                        }
+
+                        for (int i = 0; i < (programLength + 1); i++) {
+                            Serial.print(ascii(program0[i] - 1));
+                            Serial.print('1');
+                        }
+                    }
+
+                    if (errorCell == 1) {
+                        for (int i = 0; i < 80; i++) {
                             if (program1[i] != 0) {
                                 programLength = i;
                             }
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program1[i] - 1));
+                            Serial.print(ascii(program0[i] - 1));
                             Serial.print('1');
                         }
                     }
 
-                    if (errorCell == 1) {
+                    if (errorCell == 2) {
                         for (int i = 0; i < 80; i++) {
                             if (program2[i] != 0) {
                                 programLength = i;
@@ -686,12 +743,12 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program1[i] - 1));
+                            Serial.print(ascii(program0[i] - 1));
                             Serial.print('1');
                         }
                     }
 
-                    if (errorCell == 2) {
+                    if (errorCell == 3) {
                         for (int i = 0; i < 80; i++) {
                             if (program3[i] != 0) {
                                 programLength = i;
@@ -699,20 +756,7 @@ void loop() {
                         }
 
                         for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program1[i] - 1));
-                            Serial.print('1');
-                        }
-                    }
-
-                    if (errorCell == 3) {
-                        for (int i = 0; i < 80; i++) {
-                            if (program4[i] != 0) {
-                                programLength = i;
-                            }
-                        }
-
-                        for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program1[i] - 1));
+                            Serial.print(ascii(program0[i] - 1));
                             Serial.print('1');
                         }
                     }
@@ -843,17 +887,17 @@ void loop() {
             for (int i = 0; i < 80; i++) {
                 if (program[i] != 0) {
                     programLength = i;
-
-                    if (clearCells && !(programState)) {
-                        cells[i] = 0;
-                    }
                 }
+            }
+            
+            if (clearCells && !(programState)) {
+                memset(cells, 0, sizeof(cells));
             }
             
             clearCells = true;
             
             if (errorType == 0) {
-              programState = !(programState);
+            programState = !(programState);
             }
             
             if (programState && program[0] != 0) {
@@ -950,30 +994,30 @@ void loop() {
 
     if (!(programState) && (currentProgramCell - 1) != programLength && deviceOn) {
         if (program[currentProgramCell] == 1) {
-            cells[currentCell]++;
+            writeCell(currentCell, 1, 1);
         }
 
         if (program[currentProgramCell] == 2) {
-            cells[currentCell]--;
+            writeCell(currentCell, -1, 1);
         }
         
         if (program[currentProgramCell] == 3) {
-            if (currentCell == 0) {
-                errorType = 1;
-            } else {
+            if (currentCell > 0) {
                 currentCell--;
+            } else {
+                errorType = 1;
             }
         }
 
         if (program[currentProgramCell] == 4) {
-            if (currentCell == 80) {
-                errorType = 2;
-            } else {
+            if (currentCell < 80 || (currentCell < 400 && programConcatenation)) {
                 currentCell++;
+            } else {
+                errorType = 2;
             }
         }
 
-        if (program[currentProgramCell] == 5 && cells[currentCell] == 0) {
+        if (program[currentProgramCell] == 5 && readCell(currentCell) == 0) {
             bracketsPassed = 0;
             
             openBracketStart:
@@ -1007,7 +1051,7 @@ void loop() {
             }
         }
 
-        if (program[currentProgramCell] == 6 && cells[currentCell] != 0) {
+        if (program[currentProgramCell] == 6 && readCell(currentCell) != 0) {
             bracketsPassed = 0;
 
             closedBracketStart:
@@ -1042,87 +1086,87 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 7) {
-            if (cells[currentCell] == 0) {
+            if (readCell(currentCell) == 0) {
                 if (analogInputValue2 < 255) {
-                    cells[currentCell] = 1;
+                    writeCell(currentCell, 1, 0);
                 } else {
-                    cells[currentCell] = 0;
+                    writeCell(currentCell, 0, 0);
                 }
 
                 if (analogInputValue2 > 767) {
-                    cells[currentCell + 1] = 1;
+                    writeCell((currentCell + 1), 1, 0);
                 } else {
-                    cells[currentCell + 1] = 0;
+                    writeCell((currentCell + 1), 0, 0);
                 }
                 
                 if (analogInputValue1 > 767) {
-                    cells[currentCell + 2] = 1;
+                    writeCell((currentCell + 2), 1, 0);
                 } else {
-                    cells[currentCell + 2] = 0;
+                    writeCell((currentCell + 2), 0, 0);
                 }
                 
                 if (analogInputValue1 < 255) {
-                    cells[currentCell + 3] = 1;
+                    writeCell((currentCell + 3), 1, 0);
                 } else {
-                    cells[currentCell + 3] = 0;
+                    writeCell((currentCell + 3), 0, 0);
                 }
                 
                 if (digitalInputValue1 > 1000 && analogInputValue2 < 1000) {
-                    cells[currentCell + 4] = 1;
+                    writeCell((currentCell + 4), 1, 0);
                 } else {
-                    cells[currentCell + 4] = 0;
+                    writeCell((currentCell + 4), 0, 0);
                 }
             } else {
-                cells[currentCell] = round(analogInputValue2 / 100);
-                cells[currentCell + 1] = round(analogInputValue1 / 100);
+                writeCell(currentCell, round(analogInputValue2 / 100), 0);
+                writeCell((currentCell + 1), round(analogInputValue1 / 100), 0);
 
                 if (digitalInputValue1 > 1000 && analogInputValue2 < 1000) {
-                    cells[currentCell + 2] = 1;
+                    writeCell((currentCell + 2), 1, 0);
                 } else {
-                    cells[currentCell + 2] = 0;
+                    writeCell((currentCell + 2), 0, 0);
                 }
             }
         }
 
         if (program[currentProgramCell] == 8) {
-            if (cells[currentCell + 2] < 20) {
-                lcd.setCursor(cells[currentCell + 2], cells[currentCell + 3]);
+            if (readCell(currentCell + 2) < 20) {
+                lcd.setCursor(readCell(currentCell + 2), readCell(currentCell + 3));
             } else {
-                lcd.setCursor(cells[currentCell + 2] % 20, floor(cells[currentCell + 2] / 20));
+                lcd.setCursor(readCell(currentCell + 2) % 20, floor(readCell(currentCell + 2) / 20));
             }
 
-            if (cells[currentCell + 1] == 0) {
-                lcd.print(cells[currentCell]);
+            if (readCell(currentCell + 1) == 0) {
+                lcd.print(readCell(currentCell));
             }
             
-            if (cells[currentCell + 1] == 1) {
-                if (cells[currentCell] < 0 || cells[currentCell] > 44) {
+            if (readCell(currentCell + 1) == 1) {
+                if (readCell(currentCell) < 0 || readCell(currentCell) > 44) {
                     errorType = 5;
                 } else {
-                    lcd.print(ascii(cells[currentCell]));
+                    lcd.print(ascii(readCell(currentCell)));
                 }
             }
             
-            if (cells[currentCell + 1] == 2) {
-                if (cells[currentCell] < 0 || cells[currentCell] > 5) {
+            if (readCell(currentCell + 1) == 2) {
+                if (readCell(currentCell) || readCell(currentCell) > 5) {
                     errorType = 5;
                 } else {
-                    lcd.write(byte(cells[currentCell]));
+                    lcd.write(byte(readCell(currentCell)));
                 }
             }
 
-            if (cells[currentCell + 1] == 3) {
+            if (readCell(currentCell + 1) == 3) {
                 lcd.clear();
             }
         }
 
         if (program[currentProgramCell] == 9) {
-            cells[currentCell] = random(cells[currentCell] + 1);
+            writeCell(currentCell, random(readCell(currentCell) + 1), 0);
         }
 
         if (program[currentProgramCell] == 10 && sound) {
-            if (cells[currentCell] > -14 && cells[currentCell] < 12) {
-                tone(11, notes[cells[currentCell] + 12], (cells[currentCell + 1] * 100));
+            if (readCell(currentCell) > -14 && readCell(currentCell) < 12) {
+                tone(11, notes[readCell(currentCell) + 12], (readCell(currentCell + 1) * 100));
             } else {
                 errorType = 6;
             }
@@ -1131,44 +1175,44 @@ void loop() {
         if (program[currentProgramCell] == 11) {
             Serial.begin(9600);
             
-            if (cells[currentCell + 1] == 0) {
-                Serial.print(cells[currentCell]);
+            if (readCell(currentCell + 1) == 0) {
+                Serial.print(readCell(currentCell));
             }
 
-            if (cells[currentCell + 1] == 1) {
-                Serial.print(ascii(cells[currentCell]));
+            if (readCell(currentCell + 1) == 1) {
+                Serial.print(ascii(readCell(currentCell)));
             }
 
-            if (cells[currentCell + 1] == 2) {
-                Serial.print(char(cells[currentCell] + 128));
+            if (readCell(currentCell + 1) == 2) {
+                Serial.print(char(readCell(currentCell) + 128));
             }
             
-            Serial.print(cells[currentCell + 2]);
+            Serial.print(readCell(currentCell + 2));
             
-            if (cells[currentCell + 3] == 1) {
-                cells[currentCell] = -1;
+            if (readCell(currentCell + 3) == 1) {
+                charBuffer = 'a';
                 
-                while (cells[currentCell] == -1) {
+                while (charBuffer == 'a') {
                     if (Serial.available() > 0) {
                         charBuffer = Serial.read();
 
                         if (int(charBuffer) > 47 && int(charBuffer) < 58) {
-                            cells[currentCell] = int(charBuffer) - 48;
-                            cells[currentCell + 1] = 0;
+                            writeCell(currentCell, (int(charBuffer) - 48), 0);
+                            writeCell((currentCell + 1), 0, 0);
                         } else {
                             if (int(charBuffer) > 96 && int(charBuffer) < 123) {
                                 for (int i = 0; i < 5; i++) {
                                     if (inputs[i] == charBuffer) {
-                                        cells[currentCell + i] = 1;
+                                        writeCell((currentCell + i), 1, 0);
                                     } else {
-                                        cells[currentCell + i] = 0;
+                                        writeCell((currentCell + i), 0, 0);
                                     }
                                 }
                             } else {
                                 for (int i = 0; i < 45; i++) {
                                     if (ascii(i) == charBuffer) {
-                                        cells[currentCell] = i;
-                                        cells[currentCell + 1] = 1;
+                                        writeCell(currentCell, i, 0);
+                                        writeCell((currentCell + 1), 1, 0);
                                     }
                                 }
                             }
@@ -1181,57 +1225,59 @@ void loop() {
         }
         
         if (program[currentProgramCell] == 12) {
-            delay(cells[currentCell] * 100);
+            delay(readCell(currentCell) * 100);
         }
 
         if (program[currentProgramCell] == 13) {
-            currentCell = cells[currentCell];
+            if (readCell(currentCell) > -1) {
+                if (readCell(currentCell) < 80 || (readCell(currentCell) < 400 && programConcatenation)) {
+                    currentCell = readCell(currentCell);
+                } else {
+                    errorType = 2;
+                }
+            } else {
+                errorType = 1;
+            }
         }
         
         if (program[currentProgramCell] == 14) {
-            if (cells[currentCell + 1] == 0) {
-                cells[currentCell] = cells[cells[currentCell]];
+            if (readCell(currentCell + 1) == 0) {
+                writeCell(currentCell, readCell(readCell(currentCell)), 0);
             } else {
                 errorCell = 0;
 
-                for (int i = 0; i < 7; i++) {
-                    errorCell += (cells[currentCell + (i + 2)] * pow(2, (6 - i)));
-
-                    if (cells[currentCell + (i + 2)] == 1 && pow(2, (6 - i)) > 2) {
-                        errorCell++;
-                    }
+                for (int i = 0; i < 9; i++) {
+                    errorCell += (readCell(currentCell + (i + 2)) * powBase2[i]);
                 }
 
-                cells[currentCell] = errorCell;
+                writeCell(currentCell, errorCell, 0);
             }
         }
 
         if (program[currentProgramCell] == 15) {
-            if (cells[currentCell] < 0 || cells[currentCell] > 3) {
-                errorType = 7;
-            } else {
-                if (inputPIN == devicePIN) {
-                    if (cells[currentCell] == 0) {
+            if (inputPIN == devicePIN) {
+                if (readCell(currentCell) > -1 && readCell(currentCell) < 4) {
+                    if (readCell(currentCell) == 0) {
+                        for (int i = 0; i < 80; i++) {
+                            program[i] = program0[i];
+                        }
+                    }
+
+                    if (readCell(currentCell) == 1) {
                         for (int i = 0; i < 80; i++) {
                             program[i] = program1[i];
                         }
                     }
 
-                    if (cells[currentCell] == 1) {
+                    if (readCell(currentCell) == 2) {
                         for (int i = 0; i < 80; i++) {
                             program[i] = program2[i];
                         }
                     }
 
-                    if (cells[currentCell] == 2) {
+                    if (readCell(currentCell) == 3) {
                         for (int i = 0; i < 80; i++) {
                             program[i] = program3[i];
-                        }
-                    }
-
-                    if (cells[currentCell] == 3) {
-                        for (int i = 0; i < 80; i++) {
-                            program[i] = program4[i];
                         }
                     }
                     
@@ -1245,8 +1291,14 @@ void loop() {
                     notCurrentProgram = true;
                     currentProgramCell = -1;
                 } else {
-                    errorType = 8;
+                    if (readCell(currentCell) > 3) {
+                        programConcatenation = true;
+                    } else {
+                        errorType = 7;
+                    }
                 }
+            } else {
+                errorType = 8;
             }
         }
 
@@ -1255,12 +1307,13 @@ void loop() {
         }
 
         if (program[currentProgramCell] == 17) {
-            if (currentDebugCell == 10) {
-                currentDebugCell = 0;
-            }
+            debug[currentDebugCell] = readCell(currentCell);
             
-            debug[currentDebugCell] = cells[currentCell];
-            currentDebugCell++;
+            if (currentDebugCell == 9) {
+                currentDebugCell = 0;
+            } else {
+                currentDebugCell++;
+            }
         }
 
         if (program[currentProgramCell] == 18) {
@@ -1317,25 +1370,25 @@ void loop() {
         if (currentProgramCell == programLength && notCurrentProgram) {
             if (currentProgram == 0) {
                 for (int i = 0; i < 80; i++) {
-                    program[i] = program1[i];
+                    program[i] = program0[i];
                 }
             }
 
             if (currentProgram == 1) {
                 for (int i = 0; i < 80; i++) {
-                    program[i] = program2[i];
+                    program[i] = program1[i];
                 }
             }
 
             if (currentProgram == 2) {
                 for (int i = 0; i < 80; i++) {
-                    program[i] = program3[i];
+                    program[i] = program2[i];
                 }
             }
 
             if (currentProgram == 3) {
                 for (int i = 0; i < 80; i++) {
-                    program[i] = program4[i];
+                    program[i] = program3[i];
                 }
             }
 
