@@ -14,6 +14,22 @@ char dataChar = 'a';
 char commands[18] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"'};
 String charNames[7] = {"[heart]", "[checkMark]", "[crossMark]", "[apple]", "[banana]", "[entity]", "[deleteChar]"};
 
+char ascii(int value) {
+    if (value < 10) {
+        return char(value + 48);
+    } else {
+        if (value < 37) {
+            if (value == 36) {
+                return ' ';
+            } else {
+                return char(value + 55);
+            }
+        } else {
+            return commands[value - 37];
+        }
+    }
+}
+
 void setup() {
     Serial.begin(9600);
     bleKeyboard.begin();
@@ -37,22 +53,6 @@ void updateShiftLayer() {
             } else {
                 digitalWrite(i + 5, LOW);
             }
-        }
-    }
-}
-
-char ascii(int asciiValue) {
-    if (asciiValue < 10) {
-        return char(asciiValue + 48);
-    } else {
-        if (asciiValue < 37) {
-            if (asciiValue == 36) {
-                return ' ';
-            } else {
-                return char(asciiValue + 55);
-            }
-        } else {
-            return commands[asciiValue - 37];
         }
     }
 }
