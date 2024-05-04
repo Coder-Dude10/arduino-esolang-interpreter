@@ -1148,7 +1148,7 @@ void loop() {
             }
             
             if (readCell(currentCell + 1) == 2) {
-                if (readCell(currentCell) || readCell(currentCell) > 5) {
+                if (readCell(currentCell) < 0 || readCell(currentCell) > 5) {
                     errorType = 5;
                 } else {
                     lcd.write(byte(readCell(currentCell)));
