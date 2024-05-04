@@ -1,5 +1,5 @@
 # Arduino Esolang Interpreter
-An IDE and interpreter of esolang syntax for Arduino boards.
+An IDE and interpreter of Brainfk++ for Arduino boards.
 # Brainfk++ Command Set
 | Command | Description | Parameters |
 | --- | --- | --- |
@@ -16,13 +16,15 @@ An IDE and interpreter of esolang syntax for Arduino boards.
 | : | Output integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) over serial. | mode |
 | ~ | Pause for (**duration** / 10) seconds. | duration |
 | ^ | Set pointer to **currentCellValue**. | currentCellValue |
-| = | Set value of current cell to value of cell at **cellIndexNumber** (**mode** == 0) or decimal conversion of concatenated booleans. | cellIndexNumber, mode, bool6, bool5, bool4, bool3, bool2, bool1, bool0 |
-| @ | If global PIN has been set and is correct, execute program at **programIndexNumber**. | programIndexNumber |
+| = | Set value of current cell to value of cell at **cellIndexNumber** (**mode** == 0) or decimal conversion of concatenated booleans (**mode** == 1). | cellIndexNumber, mode, bool8, bool7, bool6, bool5, bool4, bool3, bool2, bool1, bool0 |
+| @ | If global PIN has been set and is correct, execute program at **programIndexNumber** (**programIndexNumber** < 4) or concatenate cell array and program arrays (**programIndexNumber** > 3). | programIndexNumber |
 | * | Do not clear cell memory when program is finished. | - |
 | / | Push **currentCellValue** to debug array. | currentCellValue |
 | " | Output debug array at character (0, 0). | - |
 # Brainfk++ Character Set
 ![alt text](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Character%20Set.png?raw=true)
+# Brainfk++ Program Concatenation
+![alt text](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Program%20Concatenation.png?raw=true)
 # Brainfk++ Error Codes
 | Error | Description |
 | --- | --- |
