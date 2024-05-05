@@ -13,7 +13,7 @@ An IDE and interpreter of Brainfk++ for Arduino boards. Try it out in [Wokwi](ht
 | . | Output **currentCellValue** as an integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) at character (**x**, **y**) on display, or clear the display (**mode** == 3). | currentCellValue, mode, x, y |
 | ? | Set current cell value to random integer from 0 to **maximumIntegerValue**. | maximumIntegerValue |
 | ! | Play a tone with a note value of **note** and a duration of (**duration** / 10) seconds. | note, duration |
-| : | Output integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) over serial. | mode |
+| : | Output **currentCellValue** as an integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) over serial, output **additionalValue** as an integer, and wait for response (integer, character, or input) if **expectResponse** == 1. | currentCellValue, mode, additionalValue, expectResponse |
 | ~ | Pause for (**duration** / 10) seconds. | duration |
 | ^ | Set pointer to **currentCellValue**. | currentCellValue |
 | = | Set value of current cell to value of cell at **cellIndexNumber** (**mode** == 0) or decimal conversion of concatenated booleans (**mode** == 1). | cellIndexNumber, mode, bool8, bool7, bool6, bool5, bool4, bool3, bool2, bool1, bool0 |
