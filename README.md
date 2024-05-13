@@ -17,14 +17,18 @@ An IDE and interpreter of Brainfk++ for Arduino boards. Try it out in [Wokwi](ht
 | ~ | Pause for (**duration** / 10) seconds. | duration |
 | ^ | Set pointer to **currentCellValue**. | currentCellValue |
 | = | Set value of current cell to value of cell at **cellIndexNumber** (**mode** == 0) or decimal conversion of concatenated booleans (**mode** == 1). | cellIndexNumber, mode, bool8, bool7, bool6, bool5, bool4, bool3, bool2, bool1, bool0 |
-| @ | If global PIN has been set and is correct, execute program at **programIndexNumber** (**programIndexNumber** < 4) or concatenate cell array and program arrays (**programIndexNumber** > 3). | programIndexNumber |
-| * | Do not clear cell memory when program is finished. | - |
+| # | Set the value of the current cell to either 0 (**currentCellValue** != 0) or 1 (**currentCellValue** == 0). | currentCellValue |
+| ▏| Set the value of the current cell to either 0 (**currentCellValue** < 0) or 1 (**currentCellValue** > -1). | currentCellValue |
+| @ | If global PIN has been set and is correct, execute program at **programIndexNumber**. | programIndexNumber |
+| * | Concatenate cell array and program arrays (**mode** == 0) or do not clear cell memory when program is finished (**mode** == 1). | mode |
+| ; | Set the value of the buffer cell to **currentCellValue**. | currentCellValue |
+| _ | Set the value of the current cell to the value of the buffer cell. | - |
 | / | Push **currentCellValue** to debug array. | currentCellValue |
 | " | Output debug array at character (0, 0). | - |
 # Brainfk++ Character Set
-![alt text](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Character%20Set.png?raw=true)
+![Brainfk++ Character Set](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Character%20Set.png?raw=true)
 # Brainfk++ Program Concatenation
-![alt text](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Program%20Concatenation.png?raw=true)
+![Brainfk++ Program Concatenation](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Brainfk%2B%2B%20Program%20Concatenation.png?raw=true)
 # Brainfk++ Error Codes
 | Error | Description |
 | --- | --- |
