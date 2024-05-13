@@ -14,6 +14,7 @@ int programLength = 0;
 int bracketsPassed = 0;
 int currentProgram = 0;
 int currentDebugCell = 0;
+int bufferCell = 0;
 int cells[80] = {0};
 int program[80] = {0};
 int program0[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 16};
@@ -34,7 +35,7 @@ bool sound = true;
 bool notCurrentProgram = false;
 bool programConcatenation = false;
 char inputs[5] = {'l', 'r', 'u', 'd', 'e'};
-char commands[18] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '@', '*', '/', '\"'};
+char commands[22] = {'+', '-', '<', '>', '[', ']', ',', '.', '?', '!', ':', '~', '^', '=', '#', '|', '@', '*', ';', '_', '/', '\"'};
 char programName[] = "AAAAAA";
 char charBuffer = 'A';
 String programNames[] = {"PROGRAM0", "PROGRAM1", "PROGRAM2", "PROGRAM3"};
@@ -115,13 +116,13 @@ byte deleteChar[] = {
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 char ascii(int value) {
-    if (value < 18) {
+    if (value < 22) {
         return commands[value];
     } else {
-        if (value == 44) {
+        if (value == 48) {
             return ' ';
         } else {
-            return char(value + 47);
+            return char(value + 43);
         }
     }
 }
@@ -200,14 +201,14 @@ void loop() {
         
         while (analogInputValue1 > 767 || analogInputValue1 < 255) {
             if (analogInputValue1 > 767) {
-                if (currentCommand == 18) {
+                if (currentCommand == 22) {
                     currentCommand = 0;
                 } else {
                     currentCommand++;
                 }
             } else {
                 if (currentCommand == 0) {
-                    currentCommand = 18;
+                    currentCommand = 22;
                 } else {
                     currentCommand--;
                 }
@@ -215,7 +216,7 @@ void loop() {
             
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
 
-            if (currentCommand == 18) {
+            if (currentCommand == 22) {
                 lcd.write(byte(6));
             } else {
                 lcd.print(ascii(currentCommand));
@@ -258,7 +259,7 @@ void loop() {
     }
     
     if (digitalInputValue1 > 1000 && analogInputValue2 < 1000 && digitalInputDelay == 500 && currentProgramCell != 80 && programState && deviceOn) {
-        if (currentCommand == 18) {
+        if (currentCommand == 22) {
             program[currentProgramCell] = 0;
 
             for (int i = 0; i < 79; i++) {
@@ -285,7 +286,7 @@ void loop() {
             }
         }
 
-        if (currentCommand == 18 || program[currentProgramCell] != 0) {
+        if (currentCommand == 22 || program[currentProgramCell] != 0) {
             for (int i = 0; i < 80; i++) {
                 if (program[i] != 0) {
                     programLength = i;
@@ -1253,8 +1254,24 @@ void loop() {
                 writeCell(currentCell, errorCell, 0);
             }
         }
-
+        
         if (program[currentProgramCell] == 15) {
+            if (readCell(currentCell) == 0) {
+                writeCell(currentCell, 1, 0);
+            } else {
+                writeCell(currentCell, 0, 0);
+            }
+        }
+
+        if (program[currentProgramCell] == 16) {
+            if (readCell(currentCell) < 0) {
+                writeCell(currentCell, 0, 0);
+            } else {
+                writeCell(currentCell, 1, 0);
+            }
+        }
+        
+        if (program[currentProgramCell] == 17) {
             if (inputPIN == devicePIN) {
                 if (readCell(currentCell) > -1 && readCell(currentCell) < 4) {
                     if (readCell(currentCell) == 0) {
@@ -1291,22 +1308,34 @@ void loop() {
                     notCurrentProgram = true;
                     currentProgramCell = -1;
                 } else {
-                    if (readCell(currentCell) > 3) {
-                        programConcatenation = true;
-                    } else {
-                        errorType = 7;
-                    }
+                    errorType = 7;
                 }
             } else {
                 errorType = 8;
             }
         }
 
-        if (program[currentProgramCell] == 16) {
-            clearCells = false;
+        if (program[currentProgramCell] == 18) {
+            if (readCell(currentCell) == 0) {
+                if (inputPIN == devicePIN) {
+                    programConcatenation = true;
+                } else {
+                    errorType = 8;
+                }
+            } else {
+                clearCells = false;
+            }
         }
 
-        if (program[currentProgramCell] == 17) {
+        if (program[currentProgramCell] == 19) {
+            bufferCell = readCell(currentCell);
+        }
+
+        if (program[currentProgramCell] == 20) {
+            writeCell(currentCell, bufferCell, 0);
+        }
+
+        if (program[currentProgramCell] == 21) {
             debug[currentDebugCell] = readCell(currentCell);
             
             if (currentDebugCell == 9) {
@@ -1316,7 +1345,7 @@ void loop() {
             }
         }
 
-        if (program[currentProgramCell] == 18) {
+        if (program[currentProgramCell] == 22) {
             debugOutput = String(debug[0]);
             
             for (int i = 1; i < currentDebugCell; i++) {
