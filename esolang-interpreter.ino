@@ -15,12 +15,12 @@ int bracketsPassed = 0;
 int currentProgram = 0;
 int currentDebugCell = 0;
 int bufferCell = 0;
-int cells[80] = {0};
-int program[80] = {0};
-int program0[80] = {4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 16};
-int program1[80] = {4, 5, 3, 10, 4, 12, 4, 4, 6, 16};
-int program2[80] = {4, 4, 4, 1, 3, 3, 3, 11, 8};
-int program3[80] = {0};
+int cells[80];
+int program[80];
+int program0[80];
+int program1[80];
+int program2[80];
+int program3[80];
 int notes[25] = {131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523};
 int powBase2[9] = {256, 128, 64, 32, 16, 8, 4, 2, 1};
 int debug[10] = {0};
@@ -131,19 +131,19 @@ int readCell(int index) {
     if (index < 80) {
         return cells[index];
     }
-    
+
     if (index > 79 && index < 160) {
         return program0[index - 80];
     }
-    
+
     if (index > 159 && index < 240) {
         return program1[index - 160];
     }
-    
+
     if (index > 239 && index < 320) {
         return program2[index - 240];
     }
-    
+
     if (index > 319) {
         return program3[index - 320];
     }
@@ -153,22 +153,22 @@ void writeCell(int index, int value, int multiplier) {
     if (index < 80) {
         cells[index] = ((cells[index] * multiplier) + value);
     }
-    
+
     if (index > 79 && index < 160) {
         program0[index - 80] = ((program0[index - 80] * multiplier) + value);
     }
-    
+
     if (index > 159 && index < 240) {
         program1[index - 160] = ((program1[index - 160] * multiplier) + value);
     }
-    
+
     if (index > 239 && index < 320) {
         program2[index - 240] = ((program2[index - 240] * multiplier) + value);
     }
-    
+
     if (index > 319) {
         program3[index - 320] = ((program3[index - 320] * multiplier) + value);
-    } 
+    }
 }
 
 void(* resetFunc) (void) = 0;
@@ -183,11 +183,6 @@ void setup() {
     lcd.createChar(5, entity);
     lcd.createChar(6, deleteChar);
     lcd.setCursor(0, 0);
-    
-    memset(cells, 0, sizeof(cells));
-    memset(program, 0, sizeof(program));
-    memset(program3, 0, sizeof(program3));
-    memset(debug, 0, sizeof(debug));
 }
 
 void loop() {
@@ -195,10 +190,10 @@ void loop() {
     analogInputValue2 = analogRead(15);
     digitalInputValue1 = analogRead(16);
     digitalInputValue2 = analogRead(17);
-    
+
     if ((analogInputValue1 > 767 || analogInputValue1 < 255) && programState) {
         lcd.noBlink();
-        
+
         while (analogInputValue1 > 767 || analogInputValue1 < 255) {
             if (analogInputValue1 > 767) {
                 if (currentCommand == 22) {
@@ -213,19 +208,19 @@ void loop() {
                     currentCommand--;
                 }
             }
-            
+
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
 
             if (currentCommand == 22) {
                 lcd.write(byte(6));
             } else {
-                lcd.print(ascii(currentCommand));
+                lcd.print(commands[currentCommand]);
             }
-            
+
             delay(500);
             analogInputValue1 = analogRead(14);
         }
-        
+
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
 
         if (program[currentProgramCell] == 0) {
@@ -233,11 +228,11 @@ void loop() {
         } else {
             lcd.print(ascii(program[currentProgramCell] - 1));
         }
-        
+
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         lcd.blink();
     }
-    
+
     if (analogInputValue2 > 767 && programState) {
         nextCell = true;
     }
@@ -245,7 +240,7 @@ void loop() {
     if (analogInputValue2 < 255 && programState) {
         previousCell = true;
     }
-    
+
     if (analogInputValue2 < 520 && nextCell && currentProgramCell != 80 && program[currentProgramCell] != 0 && deviceOn) {
         currentProgramCell++;
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -257,7 +252,7 @@ void loop() {
         lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         previousCell = false;
     }
-    
+
     if (digitalInputValue1 > 1000 && analogInputValue2 < 1000 && digitalInputDelay == 500 && currentProgramCell != 80 && programState && deviceOn) {
         if (currentCommand == 22) {
             program[currentProgramCell] = 0;
@@ -294,7 +289,7 @@ void loop() {
             }
 
             lcd.clear();
-            
+
             if (program[0] != 0) {
                 for (currentProgramCell = 0; currentProgramCell < (programLength + 1); currentProgramCell++) {
                     lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -305,10 +300,10 @@ void loop() {
             currentProgramCell = errorCell;
             lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
         }
-        
+
         digitalInputDelay = 0;
     }
-    
+
     if ((digitalInputValue2 == 0 && analogInputValue1 > 50 && analogInputValue2 > 500 && digitalInputDelay == 500 && deviceOn) || errorType != 0) {
         delay(500);
         digitalInputValue2 = analogRead(17);
@@ -340,7 +335,7 @@ void loop() {
                 while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
                     analogInputValue1 = analogRead(14);
                     digitalInputValue1 = analogRead(16);
-                    
+
                     if (analogInputValue1 > 767) {
                         previousCommand = true;
                     }
@@ -348,7 +343,7 @@ void loop() {
                     if (analogInputValue1 < 255) {
                         nextCommand = true;
                     }
-                    
+
                     if (analogInputValue1 < 520 && previousCommand) {
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(" "));
@@ -358,7 +353,7 @@ void loop() {
                         } else {
                             currentCommand--;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
@@ -374,14 +369,14 @@ void loop() {
                         } else {
                             currentCommand++;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
                         nextCommand = false;
                     }
                 }
-                
+
                 if (currentCommand == 1) {
                     goto sound;
                 }
@@ -389,13 +384,13 @@ void loop() {
                 if (currentCommand == 2) {
                     goto about;
                 }
-                
+
                 if (currentCommand == 3) {
                     nextCell = true;
                 } else {
                     nextCell = false;
                 }
-                
+
                 if (inputPIN == "") {
                     digitalInputValue1 = 0;
                     currentCommand = 0;
@@ -410,10 +405,10 @@ void loop() {
                     while (currentCell < 5) {
                         analogInputValue1 = analogRead(14);
                         digitalInputValue1 = analogRead(16);
-                        
+
                         if (analogInputValue1 > 767 || analogInputValue1 < 255) {
                             lcd.noBlink();
-                            
+
                             while (analogInputValue1 > 767 || analogInputValue1 < 255) {
                                 if (analogInputValue1 > 767) {
                                     if (currentCommand == 9) {
@@ -428,7 +423,7 @@ void loop() {
                                         currentCommand--;
                                     }
                                 }
-                                
+
                                 lcd.setCursor(currentCell + 4, 0);
                                 lcd.print(currentCommand);
                                 delay(500);
@@ -440,7 +435,7 @@ void loop() {
                             lcd.setCursor(currentCell + 4, 0);
                             lcd.blink();
                         }
-                        
+
                         if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
                             inputPIN += String(currentCommand);
                             lcd.print(currentCommand);
@@ -449,7 +444,7 @@ void loop() {
                             delay(500);
                         }
                     }
-                    
+
                     currentCommand = 0;
                     lcd.noBlink();
                 }
@@ -460,7 +455,7 @@ void loop() {
                     digitalInputValue1 = 0;
                     inputPIN = "";
                     delay(500);
-                    
+
                     while (digitalInputValue1 < 1000) {
                         digitalInputValue1 = analogRead(16);
                     }
@@ -471,11 +466,11 @@ void loop() {
                 if (nextCell) {
                     goto reset;
                 }
-                
+
                 digitalInputValue1 = 0;
                 delay(500);
                 lcd.clear();
-                
+
                 for (int i = 0; i < 4; i++) {
                     lcd.setCursor(1, i);
                     lcd.print(programNames[i]);
@@ -484,11 +479,11 @@ void loop() {
                 lcd.setCursor(0, 0);
                 lcd.print(F(">"));
                 currentCommand = 0;
-                
+
                 while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
                     analogInputValue1 = analogRead(14);
                     digitalInputValue1 = analogRead(16);
-                    
+
                     if (analogInputValue1 > 767) {
                         previousCommand = true;
                     }
@@ -496,7 +491,7 @@ void loop() {
                     if (analogInputValue1 < 255) {
                         nextCommand = true;
                     }
-                    
+
                     if (analogInputValue1 < 520 && previousCommand) {
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(" "));
@@ -506,7 +501,7 @@ void loop() {
                         } else {
                             currentCommand--;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
@@ -522,7 +517,7 @@ void loop() {
                         } else {
                             currentCommand++;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
@@ -541,7 +536,7 @@ void loop() {
                 lcd.setCursor(1, 2);
                 lcd.print(F("Rename"));
                 lcd.setCursor(1, 3);
-                lcd.print(F("Transmit"));
+                lcd.print(F("Receive/Transmit"));
                 lcd.setCursor(0, 0);
                 lcd.print(F(">"));
                 delay(500);
@@ -549,7 +544,7 @@ void loop() {
                 while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
                     analogInputValue1 = analogRead(14);
                     digitalInputValue1 = analogRead(16);
-                    
+
                     if (analogInputValue1 > 767) {
                         previousCommand = true;
                     }
@@ -557,7 +552,7 @@ void loop() {
                     if (analogInputValue1 < 255) {
                         nextCommand = true;
                     }
-                    
+
                     if (analogInputValue1 < 520 && previousCommand) {
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(" "));
@@ -567,7 +562,7 @@ void loop() {
                         } else {
                             currentCommand--;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
@@ -583,7 +578,7 @@ void loop() {
                         } else {
                             currentCommand++;
                         }
-                        
+
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(">"));
                         delay(500);
@@ -646,6 +641,12 @@ void loop() {
                         }
                     }
 
+                    for (int i = 0; i < 80; i++) {
+                        if (program[i] != 0) {
+                            programLength = i;
+                        }
+                    }
+
                     currentProgram = errorCell;
                 }
 
@@ -663,10 +664,10 @@ void loop() {
                     while (currentCell < 6) {
                         analogInputValue1 = analogRead(14);
                         digitalInputValue1 = analogRead(16);
-                        
+
                         if (analogInputValue1 > 767 || analogInputValue1 < 255) {
                             lcd.noBlink();
-                            
+
                             while (analogInputValue1 > 767 || analogInputValue1 < 255) {
                                 if (analogInputValue1 > 767) {
                                     if (currentCommand == 26) {
@@ -681,7 +682,7 @@ void loop() {
                                         currentCommand--;
                                     }
                                 }
-                                
+
                                 lcd.setCursor(currentCell + 13, 0);
                                 lcd.print(ascii(currentCommand + 18));
                                 delay(500);
@@ -693,7 +694,7 @@ void loop() {
                             lcd.setCursor(currentCell + 13, 0);
                             lcd.blink();
                         }
-                        
+
                         if (digitalInputValue1 > 1000 && analogInputValue1 < 520) {
                             programName[currentCell] = ascii(currentCommand + 18);
                             lcd.print(ascii(currentCommand + 18));
@@ -708,61 +709,43 @@ void loop() {
                 }
 
                 if (currentCommand == 3) {
+                    digitalInputValue1 = 0;
+                    currentCommand = 0;
+                    lcd.clear();
+                    lcd.setCursor(1, 0);
+                    lcd.print(F("Receive"));
+                    lcd.setCursor(1, 1);
+                    lcd.print(F("Transmit"));
+                    lcd.setCursor(0, 0);
+                    lcd.print(F(">"));
+                    delay(500);
+                    
+                    while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
+                        analogInputValue1 = analogRead(14);
+                        digitalInputValue1 = analogRead(16);
+                        
+                        if (analogInputValue1 > 767 || analogInputValue1 < 255) {
+                            nextCommand = true;
+                        }
+                        
+                        if ((analogInputValue1 < 520 || analogInputValue1 > 500) && nextCommand) {
+                            lcd.setCursor(0, currentCommand);
+                            lcd.print(F(" "));
+                            currentCommand = (currentCommand * -1) + 1;
+                            lcd.setCursor(0, currentCommand);
+                            lcd.print(F(">"));
+                            delay(500);
+                            nextCommand = false;
+                        }
+                    }
+                    
                     Serial.begin(9600);
-
-                    if (errorCell == 0) {
-                        for (int i = 0; i < 80; i++) {
-                            if (program0[i] != 0) {
-                                programLength = i;
-                            }
-                        }
-
-                        for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program0[i] - 1));
-                            Serial.print('1');
-                        }
+                    
+                    if (currentCommand == 0) {
+                        goto receive;
+                    } else {
+                        goto transmit;
                     }
-
-                    if (errorCell == 1) {
-                        for (int i = 0; i < 80; i++) {
-                            if (program1[i] != 0) {
-                                programLength = i;
-                            }
-                        }
-
-                        for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program0[i] - 1));
-                            Serial.print('1');
-                        }
-                    }
-
-                    if (errorCell == 2) {
-                        for (int i = 0; i < 80; i++) {
-                            if (program2[i] != 0) {
-                                programLength = i;
-                            }
-                        }
-
-                        for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program0[i] - 1));
-                            Serial.print('1');
-                        }
-                    }
-
-                    if (errorCell == 3) {
-                        for (int i = 0; i < 80; i++) {
-                            if (program3[i] != 0) {
-                                programLength = i;
-                            }
-                        }
-
-                        for (int i = 0; i < (programLength + 1); i++) {
-                            Serial.print(ascii(program0[i] - 1));
-                            Serial.print('1');
-                        }
-                    }
-
-                    Serial.end();
                 }
 
                 goto end;
@@ -787,15 +770,15 @@ void loop() {
 
                 lcd.print(F("(current)"));
                 delay(500);
-                
+
                 while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
                     analogInputValue1 = analogRead(14);
                     digitalInputValue1 = analogRead(16);
-                    
+
                     if (analogInputValue1 > 767 || analogInputValue1 < 255) {
                         nextCommand = true;
                     }
-                    
+
                     if ((analogInputValue1 < 520 || analogInputValue1 > 500) && nextCommand) {
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(" "));
@@ -806,7 +789,7 @@ void loop() {
                         nextCommand = false;
                     }
                 }
-                
+
                 if (currentCommand == 0) {
                     sound = true;
                 } else {
@@ -817,6 +800,7 @@ void loop() {
 
                 about:
 
+                digitalInputValue1 = 0;
                 lcd.setCursor(0, 0);
                 lcd.print(F("MIT License (c) 2023"));
                 lcd.setCursor(0, 1);
@@ -826,10 +810,6 @@ void loop() {
                 lcd.setCursor(0, 3);
                 lcd.print(F("Press ENTER to exit."));
                 delay(1000);
-
-                while (digitalInputValue1 > 1000) {
-                    digitalInputValue1 = analogRead(16);
-                }
                 
                 while (digitalInputValue1 < 1000) {
                     digitalInputValue1 = analogRead(16);
@@ -849,15 +829,15 @@ void loop() {
                 lcd.setCursor(0, 0);
                 lcd.print(F(">"));
                 delay(500);
-                
+
                 while (digitalInputValue1 < 1000 || analogInputValue1 > 520) {
                     analogInputValue1 = analogRead(14);
                     digitalInputValue1 = analogRead(16);
-                    
+
                     if (analogInputValue1 > 767 || analogInputValue1 < 255) {
                         nextCommand = true;
                     }
-                    
+
                     if ((analogInputValue1 < 520 || analogInputValue1 > 500) && nextCommand) {
                         lcd.setCursor(0, currentCommand);
                         lcd.print(F(" "));
@@ -873,8 +853,122 @@ void loop() {
                     resetFunc();
                 }
 
-                end:
+                goto end;
+
+                receive:
+
+                if (errorCell == 0) {
+                    charBuffer = '+';
+                    currentDebugCell = 0;
+
+                    if (errorCell == 0) {
+                        memset(program0, 0, sizeof(program0));
+                    }
+
+                    if (errorCell == 1) {
+                        memset(program1, 0, sizeof(program1));
+                    }
+
+                    if (errorCell == 2) {
+                        memset(program2, 0, sizeof(program2));
+                    }
+
+                    if (errorCell == 3) {
+                        memset(program3, 0, sizeof(program3));
+                    }
+                    
+                    while (charBuffer != 'a') {
+                        Serial.print(currentDebugCell);
+                        Serial.print('4');
+                        while (Serial.available() == 0);
+                        charBuffer = Serial.read();
+                        
+                        for (int i = 0; i < 22; i++) {
+                            if (commands[i] == charBuffer) {
+                                if (errorCell == 0) {
+                                    program0[currentDebugCell] = (i + 1);
+                                }
+
+                                if (errorCell == 1) {
+                                    program1[currentDebugCell] = (i + 1);
+                                }
+
+                                if (errorCell == 2) {
+                                    program2[currentDebugCell] = (i + 1);
+                                }
+
+                                if (errorCell == 3) {
+                                    program3[currentDebugCell] = (i + 1);
+                                }
+                            }
+                        }
+
+                        currentDebugCell++;
+                    }
+                }
+
+                Serial.end();
+
+                goto end;
+
+                transmit:
+
+                if (errorCell == 0) {
+                    for (int i = 0; i < 80; i++) {
+                        if (program0[i] != 0) {
+                            programLength = i;
+                        }
+                    }
+                    
+                    for (int i = 0; i < (programLength + 1); i++) {
+                        Serial.print(ascii(program0[i] - 1));
+                        Serial.print('1');
+                    }
+                }
                 
+                if (errorCell == 1) {
+                    for (int i = 0; i < 80; i++) {
+                        if (program1[i] != 0) {
+                            programLength = i;
+                        }
+                    }
+                    
+                    for (int i = 0; i < (programLength + 1); i++) {
+                        Serial.print(ascii(program1[i] - 1));
+                        Serial.print('1');
+                    }
+                }
+                
+                if (errorCell == 2) {
+                    for (int i = 0; i < 80; i++) {
+                        if (program2[i] != 0) {
+                            programLength = i;
+                        }
+                    }
+                    
+                    for (int i = 0; i < (programLength + 1); i++) {
+                        Serial.print(ascii(program2[i] - 1));
+                        Serial.print('1');
+                    }
+                }
+                
+                if (errorCell == 3) {
+                    for (int i = 0; i < 80; i++) {
+                        if (program3[i] != 0) {
+                            programLength = i;
+                        }
+                    }
+                    
+                    for (int i = 0; i < (programLength + 1); i++) {
+                        Serial.print(ascii(program3[i] - 1));
+                        Serial.print('1');
+                    }
+                }
+                
+                Serial.end();
+
+                end:
+
                 errorCell = programLength + 1;
                 errorType = 1;
             }
@@ -890,17 +984,17 @@ void loop() {
                     programLength = i;
                 }
             }
-            
+
             if (clearCells && !(programState)) {
                 memset(cells, 0, sizeof(cells));
             }
-            
+
             clearCells = true;
-            
+
             if (errorType == 0) {
             programState = !(programState);
             }
-            
+
             if (programState && program[0] != 0) {
                 for (currentProgramCell = 0; currentProgramCell < programLength; currentProgramCell++) {
                     lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -909,7 +1003,7 @@ void loop() {
 
                 lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
                 lcd.print(ascii(program[currentProgramCell] - 1));
-                
+
                 if (errorType != 0) {
                     currentProgramCell = errorCell;
                     lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -917,7 +1011,7 @@ void loop() {
             }
 
             errorType = 0;
-            
+
             if (!(programState)) {
                 lcd.noBlink();
                 currentCell = 0;
@@ -926,7 +1020,7 @@ void loop() {
 
             delay(500);
         }
-        
+
         digitalInputDelay = 0;
     }
 
@@ -938,7 +1032,7 @@ void loop() {
                 programLength = i;
             }
         }
-        
+
         if (program[0] != 0) {
             for (currentProgramCell = 0; currentProgramCell < programLength; currentProgramCell++) {
                 lcd.setCursor(currentProgramCell % 20, floor(currentProgramCell / 20));
@@ -954,7 +1048,7 @@ void loop() {
         if (!(sound)) {
             goto startupSoundEnd;
         }
-        
+
         tone(11, 15, 5.81);
         delay(200);
         tone(11, 14, 5.81);
@@ -1001,7 +1095,7 @@ void loop() {
         if (program[currentProgramCell] == 2) {
             writeCell(currentCell, -1, 1);
         }
-        
+
         if (program[currentProgramCell] == 3) {
             if (currentCell > 0) {
                 currentCell--;
@@ -1020,19 +1114,19 @@ void loop() {
 
         if (program[currentProgramCell] == 5 && readCell(currentCell) == 0) {
             bracketsPassed = 0;
-            
+
             openBracketStart:
-            
+
             while (program[currentProgramCell] != 6) {
                 analogInputValue1 = analogRead(14);
                 analogInputValue2 = analogRead(15);
                 digitalInputValue2 = analogRead(17);
-                
+
                 if (digitalInputValue2 == 0 && analogInputValue1 > 50 && analogInputValue2 > 500) {
                     programState = true;
                     break;
                 }
-                
+
                 if (currentProgramCell == programLength) {
                     errorType = 3;
                     break;
@@ -1066,7 +1160,7 @@ void loop() {
                     programState = true;
                     break;
                 }
-                
+
                 if (currentProgramCell == 0) {
                     errorType = 4;
                     break;
@@ -1099,19 +1193,19 @@ void loop() {
                 } else {
                     writeCell((currentCell + 1), 0, 0);
                 }
-                
+
                 if (analogInputValue1 > 767) {
                     writeCell((currentCell + 2), 1, 0);
                 } else {
                     writeCell((currentCell + 2), 0, 0);
                 }
-                
+
                 if (analogInputValue1 < 255) {
                     writeCell((currentCell + 3), 1, 0);
                 } else {
                     writeCell((currentCell + 3), 0, 0);
                 }
-                
+
                 if (digitalInputValue1 > 1000 && analogInputValue2 < 1000) {
                     writeCell((currentCell + 4), 1, 0);
                 } else {
@@ -1139,7 +1233,7 @@ void loop() {
             if (readCell(currentCell + 1) == 0) {
                 lcd.print(readCell(currentCell));
             }
-            
+
             if (readCell(currentCell + 1) == 1) {
                 if (readCell(currentCell) < 0 || readCell(currentCell) > 44) {
                     errorType = 5;
@@ -1147,7 +1241,7 @@ void loop() {
                     lcd.print(ascii(readCell(currentCell)));
                 }
             }
-            
+
             if (readCell(currentCell + 1) == 2) {
                 if (readCell(currentCell) < 0 || readCell(currentCell) > 5) {
                     errorType = 5;
@@ -1175,7 +1269,7 @@ void loop() {
 
         if (program[currentProgramCell] == 11) {
             Serial.begin(9600);
-            
+
             if (readCell(currentCell + 1) == 0) {
                 Serial.print(readCell(currentCell));
             }
@@ -1187,12 +1281,12 @@ void loop() {
             if (readCell(currentCell + 1) == 2) {
                 Serial.print(char(readCell(currentCell) + 128));
             }
-            
+
             Serial.print(readCell(currentCell + 2));
-            
+
             if (readCell(currentCell + 3) == 1) {
                 charBuffer = 'a';
-                
+
                 while (charBuffer == 'a') {
                     if (Serial.available() > 0) {
                         charBuffer = Serial.read();
@@ -1221,10 +1315,10 @@ void loop() {
                     }
                 }
             }
-            
+
             Serial.end();
         }
-        
+
         if (program[currentProgramCell] == 12) {
             delay(readCell(currentCell) * 100);
         }
@@ -1240,7 +1334,7 @@ void loop() {
                 errorType = 1;
             }
         }
-        
+
         if (program[currentProgramCell] == 14) {
             if (readCell(currentCell + 1) == 0) {
                 writeCell(currentCell, readCell(readCell(currentCell)), 0);
@@ -1254,7 +1348,7 @@ void loop() {
                 writeCell(currentCell, errorCell, 0);
             }
         }
-        
+
         if (program[currentProgramCell] == 15) {
             if (readCell(currentCell) == 0) {
                 writeCell(currentCell, 1, 0);
@@ -1270,7 +1364,7 @@ void loop() {
                 writeCell(currentCell, 1, 0);
             }
         }
-        
+
         if (program[currentProgramCell] == 17) {
             if (inputPIN == devicePIN) {
                 if (readCell(currentCell) > -1 && readCell(currentCell) < 4) {
@@ -1297,13 +1391,13 @@ void loop() {
                             program[i] = program3[i];
                         }
                     }
-                    
+
                     for (int i = 0; i < 80; i++) {
                         if (program[i] != 0) {
                             programLength = i;
                         }
                     }
-                    
+
                     errorCell = currentProgramCell;
                     notCurrentProgram = true;
                     currentProgramCell = -1;
@@ -1337,7 +1431,7 @@ void loop() {
 
         if (program[currentProgramCell] == 21) {
             debug[currentDebugCell] = readCell(currentCell);
-            
+
             if (currentDebugCell == 9) {
                 currentDebugCell = 0;
             } else {
@@ -1347,15 +1441,15 @@ void loop() {
 
         if (program[currentProgramCell] == 22) {
             debugOutput = String(debug[0]);
-            
+
             for (int i = 1; i < currentDebugCell; i++) {
                 debugOutput += ("," + String(debug[i]));
             }
-            
+
             lcd.setCursor(0, 0);
             lcd.print(debugOutput);
         }
-        
+
         if (errorType != 0) {
             lcd.clear();
             lcd.setCursor(0, 0);
@@ -1367,15 +1461,15 @@ void loop() {
             lcd.setCursor(0, 1);
             lcd.print(F(">"));
             currentCommand = 0;
-            
+
             while (digitalInputValue1 < 1000) {
                 analogInputValue1 = analogRead(14);
                 digitalInputValue1 = analogRead(16);
-                
+
                 if (analogInputValue1 > 767 || analogInputValue1 < 255) {
                     nextCommand = true;
                 }
-                
+
                 if ((analogInputValue1 < 520 || analogInputValue1 > 500) && nextCommand) {
                     lcd.setCursor(0, currentCommand + 1);
                     lcd.print(F(" "));
@@ -1386,7 +1480,7 @@ void loop() {
                     nextCommand = false;
                 }
             }
-            
+
             if (currentCommand == 0) {
                 errorCell = currentProgramCell;
             } else {
