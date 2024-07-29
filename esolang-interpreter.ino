@@ -443,7 +443,7 @@ void loop() {
                                     }
                                 } else {
                                     if (currentCommand == 0) {
-                                        currentCommand == 9;
+                                        currentCommand = 9;
                                     } else {
                                         currentCommand--;
                                     }
@@ -873,14 +873,14 @@ void loop() {
 
                         while (analogInputValue1 > 767 || analogInputValue1 < 255) {
                             if (analogInputValue1 > 767) {
-                                if (currentCommand == 26) {
+                                if (currentCommand == 25) {
                                     currentCommand = 0;
                                 } else {
                                     currentCommand++;
                                 }
                             } else {
                                 if (currentCommand == 0) {
-                                    currentCommand = 26;
+                                    currentCommand = 25;
                                 } else {
                                     currentCommand--;
                                 }
