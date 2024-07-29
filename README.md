@@ -14,7 +14,7 @@ Brainfk++ is a low-level programming language comprised of 22 instructions, with
 | ] | If **currentCellValue** != 0, goto cell after corresponding '[' instruction. | currentCellValue |
 | , | Take input and set current and following cells to either (left, right, up, down, enter) (**mode** == 0) or (analogInput1, analogInput2, enter) (**mode** == 1). | mode |
 | . | Output **currentCellValue** as an integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) at character (**x**, **y**) on display, or clear the display (**mode** == 3). | currentCellValue, mode, x, y |
-| ? | Set the current cell value to random integer from 0 to **maximumIntegerValue**. | maximumIntegerValue |
+| ? | Set the value of the current cell to random integer from 0 to **maximumIntegerValue**. | maximumIntegerValue |
 | ! | Play a tone with a note value of **note** and a duration of (**duration** / 10) seconds. | note, duration |
 | : | Output **currentCellValue** as an integer (**mode** == 0), character (**mode** == 1), or custom character (**mode** == 2) over serial, output **additionalValue** as an integer over serial, and wait for response (integer, character, or input) (**expectResponse** == 1). | currentCellValue, mode, additionalValue, expectResponse |
 | ~ | Pause for (**duration** / 10) seconds. | duration |
