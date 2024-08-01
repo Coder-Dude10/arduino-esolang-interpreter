@@ -8,8 +8,8 @@ Brainfk++ is a low-level programming language comprised of 22 instructions, with
 | --- | --- | --- |
 | + | Increment current cell value by 1. | - |
 | - | Decrement current cell value by 1. | - |
-| < | Move pointer left by 1 cell.| - |
-| > | Move pointer right by 1 cell.| - |
+| < | Move cell pointer left by 1 cell. | - |
+| > | Move cell pointer right by 1 cell. | - |
 | [ | If **currentCellValue** == 0, goto cell after corresponding ']' instruction. | currentCellValue |
 | ] | If **currentCellValue** != 0, goto cell after corresponding '[' instruction. | currentCellValue |
 | , | Take input and set current and following cells to either (left, right, up, down, enter) (**mode** == 0) or (analogInput1, analogInput2, enter) (**mode** == 1). | mode |
