@@ -26,7 +26,7 @@ Brainfk++ is a low-level programming language comprised of 22 instructions, with
 | * | Concatenate cell array and program arrays (**mode** == 0) or do not clear cell memory when program is finished (**mode** == 1). | mode |
 | ; | Set the value of the buffer cell to **currentCellValue**. | currentCellValue |
 | _ | Set the value of the current cell to the value of the buffer cell. | - |
-| & | Set the value of the current cell to (**currentCellValue** * 10). | currentCellValue |
+| & | Set the value of the current cell to (**currentCellValue** * 2) (a.k.a. a bit shift). | currentCellValue |
 | " | Skip the next instruction. | - |
 # Brainfk++ Character Set
 ![Brainfk++ Character Set](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Images/Brainfk%2B%2B%20Character%20Set.png?raw=true)
