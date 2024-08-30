@@ -2,7 +2,7 @@
 An IDE and interpreter of Brainfk++ for Arduino boards. Try it out in [Wokwi](https://wokwi.com/projects/396988117726154753) (🌐Web-based simulator).
 # Brainfk++
 ![Brainfk++ Logo](https://github.com/Coder-Dude10/arduino-esolang-interpreter/blob/main/Images/Brainfk%2B%2B%20Logo.png?raw=true)
-Brainfk++ is a low-level programming language comprised of 22 instructions, with each instruction represented by a character. It expands on the work of Urban Müller by introducing more instructions, thereby allowing you to easily work with a large amount of data and interface with various I/O.
+Brainfk++ is a low-level programming language comprised of 22 instructions, with each instruction represented by an ASCII character. It expands on the work of Urban Müller by introducing more instructions, thereby allowing you to easily work with a large amount of data and interface with various I/O.
 # Brainfk++ Instruction Set
 | Instruction | Description | Parameters |
 | --- | --- | --- |
