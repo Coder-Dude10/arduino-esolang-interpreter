@@ -1356,9 +1356,7 @@ void loop() {
                                 if (int(charBuffer) > 96 && int(charBuffer) < 123) {
                                     for (int i = 0; i < 5; i++) {
                                         if (inputs[i] == charBuffer) {
-                                            writeCell((currentCell + i), 1, 0);
-                                        } else {
-                                            writeCell((currentCell + i), 0, 0);
+                                            writeCell(currentCell, i, 0);
                                         }
                                     }
                                 } else {
@@ -1454,7 +1452,7 @@ void loop() {
         }
 
         if (readCurrentProgramCell() == 21) {
-            writeCell(currentCell, (readCell(currentCell) * 10), 0);
+            writeCell(currentCell, (readCell(currentCell) * 2), 0);
         }
 
         if (readCurrentProgramCell() == 22) {
